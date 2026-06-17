@@ -1,7 +1,7 @@
 {
   "name": "AI Content Hub",
   "short_name": "AI Hub",
-  "start_url": "/index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#7c4dff",
