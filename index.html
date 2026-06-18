@@ -87,37 +87,68 @@
         
         <label>Rolle wählen:</label>
         <select id="role" onchange="update()">
-            <optgroup label="-----Analyse & Fakten-----">
-                <option value="EinfachErklaert">💬 Einfach Erklärt</option>
+            <optgroup label="-----inAnalyse & Fakten-----">
+                <option value="EinfachErklaert">💬 Einfach-Erklärt</option>
                 <option value="Analyst">🔍 Präzisions-Analyst</option>
                 <option value="FactChecker">⚖️ Fact-Checker</option>
-                <option value="DevilsAdvocate">😈 Gegenargumente (Kritischer Blick)</option>
-                <option value="TitleCheck">🧾 Titel-Check (Passend zur Überschrift?)</option>
-<option value="Feynman">👶 Erklär's wie einem 5-Jährigen</option>
-<option value="Brainstormer">💡 3 Business-Ideen / Use Cases</option>
-            </optgroup>
+                <option value="DevilsAdvocate">😈 Gegenargumente</option>
+
+                <option value="TitleCheck">🧾 Titel-Check</option>
+            <option value="Mentors">🧠 3-Mentoren-Feedback</option>
+            <option value="Infographic">📊 Infografik-Bauplan</option>
+            <option value="TimeCapsule">⏳ Zeitkapsel (Blick aus 2076)</option>
+            
+           </optgroup>
 
             <optgroup label="-----Briefing & Journalismus-----">
+                <option value="PaywallBuster">🔓 Paywall-Buster (Kontext-Suche)</option>
                 <option value="Journalist">📰 Redaktions-Chef</option>
                 <option value="Briefing">⚡ Executive-Briefing</option>
-                <option value="SocialMedia">📱 Social Media Post (LI & X)</option>
-<option value="FramingCheck">🕵️ Framing & Bias-Analyse</option>
-            </optgroup>
+         
+         
+                <option value="SocialMedia">📱 Social Media Post</option>
+          
+           
+           </optgroup>
 
             <optgroup label="-----Multimedia & Deep Dive-----">
+                
                 <option value="VideoSummary">🎬 Video-Zusammenfasser</option>
                 <option value="NetCheck">🌐 Internet-Abgleich & Kontext</option>
                 <option value="ActionItems">✅ To-Do & Action Items</option>
             </optgroup>
-        </select>
+            <optgroup label="-----Privat-Nutzen & Finanzen-----">
+    <option value="TrendInvestor">💰 Geldanlage- & Depot-Radar</option>
+     <option value="Sparring">🥊 Sokratischer Sparringspartner</option>
+    <option value="CareerCheck">💼 Job- & Karriere-Schutz</option>
+    <option value="BudgetCheck">🛒 Alltags-Budget & Inflation</option>
+</optgroup>
 
+<optgroup label="-----Kreativ-----">
+    <option value="Storyteller">🎭 Der Storyteller</option>
+    <option value="CuiBono">🕵️‍♂️ Wer profitiert? (Cui Bono)</option>
+<option value="BullshitFilter">💨 Buzzword- & Bullshit-Filter</option>
+
+</optgroup>
+
+            
+            
+        </select>
+        
+<button class="btn-share" onclick="share()">Teilen an KI</button>
+  <label></label>
         <label>Zusatz-Anweisung (optional):</label>
+        <label></label>
+        
+        
         <input type="text" id="customContext" placeholder="z.B. Fokus auf Kosten, kurz fassen..." oninput="update()">
-        <button type="button" onclick="clearCustomContext()" style="background: #475569; padding: 10px; font-size: 14px; border-radius: 12px; border: none; color: white; cursor: pointer; margin-bottom: 20px; width: 100%;">🗑️ Anweisung leeren</button>
+        
+                <button class="btn-share" onclick="copyToClipboard()" style="background: #475569; margin-top: 10px;">Prompt kopieren</button>
+       
+      <label></label>
+        
         <div class="preview" id="preview"></div>
-        <button class="btn-share" onclick="share()">Teilen an KI</button>
-        <button class="btn-share" onclick="copyToClipboard()" style="background: #475569; margin-top: 10px;">Prompt kopieren</button>
-    </div>
+        
 
     <div class="card">
         <details>
@@ -145,6 +176,18 @@
 let links = JSON.parse(localStorage.getItem('myLinks')) || [{ name: "DLF Presseschau", url: "https://www.deutschlandfunk.de/presseschauen-100.html" }];
 
 const roles = {
+   
+   "Mentors": "Lies den Inhalt des Links. Nimm nun nacheinander die Denkweise von 3 Persönlichkeiten ein: 1. Einem radikalen Tech-Optimisten (wie Elon Musk), 2. Einem stoischen Philosophen (wie Marcus Aurelius) und 3. Einem knallharten Finanzinvestor. Lass jeden von ihnen das Thema des Links aus seiner Sicht in je 2 Sätzen bewerten und kritisieren. Link: ",
+   "Infographic": "Analysiere den Link und verwandle den Inhalt in das Konzept für eine Infografik. Erstelle ein klares Text-Layout: 1. Die Haupt-Überschrift, 2. Einen logischen Daten-Ablauf (Schritt 1 bis 4) und 3. Vorschläge für Icons oder Symbole neben den wichtigsten 3 Kennzahlen. Alles rein textbasiert und übersichtlich. Link: ",
+   "TimeCapsule": "Schreibe einen fiktiven, kurzen Historiker-Bericht aus dem Jahr 2076. Blicke zurück auf das Ereignis/Thema in diesem Link und beschreibe, welche radikalen, unvorhergesehenen Langzeitfolgen (technologisch, gesellschaftlich oder ökologisch) diese Nachricht für die Menschheit hatte. Sei kreativ, aber logisch fundiert. Link: ",
+   "Sparring": "Analysiere die These des Artikels unter dem Link. Nimm nun eine kritische Gegenposition ein. Stelle mir 3 präzise, schwer zu beantwortende Fragen, die die Logik des Textes oder meine potenzielle Zustimmung dazu herausfordern. Antworte kurz und warte auf meine Reaktion, um eine Debatte zu starten. Link: ",
+   "TrendInvestor": "Analysiere den Inhalt des Links rein hypothetisch auf wirtschaftliche Trends. Welche Branchen, Technologien oder Sektoren könnten durch diese Entwicklung in den nächsten 5–10 Jahren profitieren (Chancen für ETFs/Aktien)? Welche bestehenden Industrien sind bedroht (Risiken)? Liefere keine Finanzberatung, sondern eine rein logische Trendanalyse basierend auf dem Text. Link: ",
+   "CareerCheck": "Nimm die Rolle eines zukunftsorientierten Karriere-Beraters ein. Wenn die Entwicklungen in diesem Link wahr werden: Welche beruflichen Fähigkeiten (Skills) werden dadurch massiv an Wert gewinnen und welche Aufgaben werden wegrationalisiert? Wie sollte sich ein Arbeitnehmer heute aufstellen, um privat und beruflich davon zu profitieren? Link: ",
+   "PaywallBuster": "Der folgende Link liegt hinter einer Bezahlschranke (Paywall). Deine Aufgabe: Nutze deine Websuche und dein aktuelles Wissen, um herauszufinden, worum es in diesem spezifischen Artikel/Thema geht. Suche nach frei zugänglichen Berichten, Pressemitteilungen oder Alternativquellen zu diesem Ereignis. Erstelle mir dann eine präzise Zusammenfassung der wichtigsten Fakten und Hintergründe, damit ich voll im Bilde bin, ohne den Paywall-Text lesen zu müssen. Link: ",
+   "CuiBono": "Analysiere diesen Artikel mit einem detektivischen Blick. Frage dich: 'Cui bono?' – Wer profitiert wirklich von dieser Entwicklung, dieser Nachricht oder diesem Gesetz? Wer verliert dabei? Welche versteckten (wirtschaftlichen oder politischen) Interessen könnten hinter den Kulissen eine Rolle spielen? Link: ",
+   "Storyteller": "Verwandle die harten Fakten und Entwicklungen aus diesem Link in eine kurze, packende Alltagsgeschichte oder Parabel. Nutze fiktive Charaktere, um das Problem und die Lösung dieses Artikels bildhaft und spannend zu erklären. Link: ",
+   "BullshitFilter": "Du bist ein skeptischer Faktensucher. Filter aus dem folgenden Link sämtliches Marketing-Geschwätz, PR-Hype, Buzzwords und emotionale Übertreibungen heraus. Reduziere den Text radikal auf das, was tatsächlich substanziell, messbar und beweisbar übrig bleibt. Link: ",
+   
     "Analyst": "Du bist ein präziser Analyst. Nutze AUSSCHLIESSLICH den Inhalt des folgenden Links. Liste die 5 wichtigsten Fakten auf. Link: ",
     "FactChecker": "Du bist ein Fact-Checker. Prüfe die Aussagen NUR anhand des Textes. Wenn eine Behauptung nicht belegt ist, markiere sie. Link: ",
     "TitleCheck": "Analysiere die Überschrift des Artikels unter diesem Link. Passt sie zum Inhalt? Ist sie Clickbait oder irreführend? Wenn sie nicht passt, schlage eine präzisere und neutralere Überschrift vor. Link: ",
@@ -155,10 +198,7 @@ const roles = {
     "DevilsAdvocate": "Du bist ein kritischer Denker. Analysiere den Text unter dem Link und liefere die 3 stärksten Gegenargumente oder Schwachstellen in der Argumentation des Autors. Link: ",
     "SocialMedia": "Schreibe basierend auf dem Link einen packenden LinkedIn-Post (inkl. passender Hashtags) und einen kurzen Tweet (max. 280 Zeichen), der die Kernbotschaft zusammenfasst. Link: ",
     "ActionItems": "Lies den Text und erstelle eine übersichtliche, nach Priorität sortierte To-Do-Liste mit konkreten Handlungsschritten (Action Items), die sich aus dem Inhalt ergeben. Link: ",
-    "EinfachErklaert": "Du bist ein Experte darin, komplexe Themen einfach zu erklären. Fasse den Inhalt des folgenden Links in einfacher Sprache zusammen, so dass es jeder sofort versteht. Nutze AUSSCHLIESSLICH den Text der Seite.Link: ",
-"FramingCheck": "Untersuche den Text unter dem Link auf emotionale Beeinflussung (Framing), Vorurteile (Bias) oder Clickbait. Welche Absicht verfolgt der Autor und welche Fakten werden eventuell einseitig dargestellt? Link: ",
-"Brainstormer": "Analysiere den Inhalt des Links und generiere 3 kreative, konkrete Geschäftsideen, Projektansätze oder Anwendungsfälle, wie man diese Informationen praktisch nutzen kann. Link: ",
-"Feynman": "Erkläre das Thema des Links so einfach, dass es ein 5-jähriges Kind versteht. Nutze eine lebendige Analogie oder ein Beispiel aus dem Alltag und verzichte komplett auf Fachbegriffe. Link: ",
+    "EinfachErklaert": "Du bist ein Experte darin, komplexe Themen einfach zu erklären. Fasse den Inhalt des folgenden Links in einfacher Sprache zusammen, so dass es jeder sofort versteht. Nutze AUSSCHLIESSLICH den Text der Seite. Link: "
 };
 
 function renderLinks() {
@@ -244,10 +284,6 @@ function exportLinks() {
     alert("Backup-Code wurde in die Zwischenablage kopiert! Speichere ihn an einem sicheren Ort. 💾");
 }
 
-function clearCustomContext() {
-    document.getElementById('customContext').value = '';
-    update();
-}
 function moveLink(index, direction) {
     const targetIndex = index + direction;
     if (targetIndex >= 0 && targetIndex < links.length) {
