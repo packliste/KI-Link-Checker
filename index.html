@@ -37,10 +37,13 @@
     }
     .btn-add { background: #10b981; border: none; color: white; padding: 16px; width: 100%; border-radius: 16px; font-weight: 600; cursor: pointer; margin-top: 5px; }
     
-    /* Favoriten */
-    summary { cursor: pointer; font-weight: 600; padding: 14px; color: #fff; background: #334155; border-radius: 12px; text-align: center; }
-    .link-item { display: flex; background: #0f172a; padding: 14px; border-radius: 12px; margin-top: 10px; align-items: center; font-size: 1rem; }
-    .del-btn { color: #f87171; padding: 0 10px; font-weight: bold; cursor: pointer; }
+details { width: 100%; }
+summary { cursor: pointer; font-weight: 600; padding: 14px; color: #fff; background: #334155; border-radius: 12px; text-align: center; list-style: none; outline: none; }
+summary::-webkit-details-marker { display: none; } /* Entfernt den Browser-Pfeil */
+
+.link-item { display: flex; background: #0f172a; padding: 14px; border-radius: 12px; margin-top: 10px; align-items: center; font-size: 1rem; justify-content: space-between; }
+.link-name { cursor: pointer; flex-grow: 1; }
+.link-open { cursor: pointer; margin-right: 15px; }
 </style>
 
 </head>
@@ -49,49 +52,55 @@
 <div class="container">
     <div class="card">
         <h2>AI Content Hub</h2>
-        <label>URL der Seite:</label>
+        <label>Paste Seiten-URL:</label>
         <input type="url" id="url" placeholder="https://..." oninput="update()" onclick="this.select()">
         
-        <label>Modus wählen:</label>
+        <label>Rolle wählen:</label>
         <select id="role" onchange="update()">
-            <optgroup label="Analyse & Fakten">
+            <optgroup label="-----Analyse & Fakten-----">
+	
+            </optgroup>
+<option value="EinfachErklaert">💬 Einfach Erklärt</option>
                 <option value="Analyst">🔍 Präzisions-Analyst</option>
                 <option value="FactChecker">⚖️ Fact-Checker</option>
-                <option value="TitleCheck">🎯 Titel-Check (Passend zur Überschrift?)</option>
+                <option value="TitleCheck">🧾 Titel-Check (Passend zur Überschrift?)</option>
             </optgroup>
 
 
 
 
-            <optgroup label="Briefing & Journalismus">
+            <optgroup label="-----Briefing & Journalismus-----">
                 <option value="Journalist">📰 Redaktions-Chef</option>
                 <option value="Briefing">⚡ Executive Briefing</option>
             </optgroup>
 
-<option value="EinfachErklaert"> EinfachErklaert</option>
-            </optgroup>
 
 
 
 
 
-            <optgroup label="Multimedia & Deep Dive">
+
+            <optgroup label="-----Multimedia & Deep Dive">
                 <option value="VideoSummary">🎬 Video-Zusammenfasser</option>
                 <option value="NetCheck">🌐 Internet-Abgleich & Kontext</option>
             </optgroup>
         </select>
 
         <div class="preview" id="preview"></div>
-        <button class="btn-share" onclick="share()">📱 Teilen an AI</button>
+        <button class="btn-share" onclick="share()">Teilen an KI</button>
     </div>
 
-    <div class="card">
-        <h3>Favoriten</h3>
-        <input type="text" id="newName" placeholder="Name">
-        <input type="url" id="newUrl" placeholder="https://...">
-        <button class="btn-add" onclick="addLink()">+ Favorit hinzufügen</button>
-        <div class="quick-links" id="quickLinksContainer"></div>
-    </div>
+<div class="card">
+    <details>
+        <summary>⭐ Favoriten verwalten (Klicken)</summary>
+        <div style="margin-top: 20px;">
+            <input type="text" id="newName" placeholder="Name">
+            <input type="url" id="newUrl" placeholder="https://...">
+            <button class="btn-add" onclick="addLink()">+ Favorit hinzufügen</button>
+            <div class="quick-links" id="quickLinksContainer"></div>
+        </div>
+    </details>
+</div>
 </div>
 
 <script>
@@ -134,7 +143,7 @@ function removeLink(index) { links.splice(index, 1); renderLinks(); }
 function update() {
     const url = document.getElementById('url').value;
     const role = document.getElementById('role').value;
-    document.getElementById('preview').innerText = roles[role] + (url || "https://www.merriam-webster.com/dictionary/hier-");
+    document.getElementById('preview').innerText = roles[role] + (url || "https://www.google.de");
 }
 async function share() {
     const text = document.getElementById('preview').innerText;
