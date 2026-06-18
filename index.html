@@ -93,12 +93,15 @@
                 <option value="FactChecker">⚖️ Fact-Checker</option>
                 <option value="DevilsAdvocate">😈 Gegenargumente (Kritischer Blick)</option>
                 <option value="TitleCheck">🧾 Titel-Check (Passend zur Überschrift?)</option>
+<option value="Feynman">👶 Erklär's wie einem 5-Jährigen</option>
+<option value="Brainstormer">💡 3 Business-Ideen / Use Cases</option>
             </optgroup>
 
             <optgroup label="-----Briefing & Journalismus-----">
                 <option value="Journalist">📰 Redaktions-Chef</option>
                 <option value="Briefing">⚡ Executive-Briefing</option>
                 <option value="SocialMedia">📱 Social Media Post (LI & X)</option>
+<option value="FramingCheck">🕵️ Framing & Bias-Analyse</option>
             </optgroup>
 
             <optgroup label="-----Multimedia & Deep Dive-----">
@@ -110,7 +113,7 @@
 
         <label>Zusatz-Anweisung (optional):</label>
         <input type="text" id="customContext" placeholder="z.B. Fokus auf Kosten, kurz fassen..." oninput="update()">
-        
+        <button type="button" onclick="clearCustomContext()" style="background: #475569; padding: 10px; font-size: 14px; border-radius: 12px; border: none; color: white; cursor: pointer; margin-bottom: 20px; width: 100%;">🗑️ Anweisung leeren</button>
         <div class="preview" id="preview"></div>
         <button class="btn-share" onclick="share()">Teilen an KI</button>
         <button class="btn-share" onclick="copyToClipboard()" style="background: #475569; margin-top: 10px;">Prompt kopieren</button>
@@ -152,7 +155,10 @@ const roles = {
     "DevilsAdvocate": "Du bist ein kritischer Denker. Analysiere den Text unter dem Link und liefere die 3 stärksten Gegenargumente oder Schwachstellen in der Argumentation des Autors. Link: ",
     "SocialMedia": "Schreibe basierend auf dem Link einen packenden LinkedIn-Post (inkl. passender Hashtags) und einen kurzen Tweet (max. 280 Zeichen), der die Kernbotschaft zusammenfasst. Link: ",
     "ActionItems": "Lies den Text und erstelle eine übersichtliche, nach Priorität sortierte To-Do-Liste mit konkreten Handlungsschritten (Action Items), die sich aus dem Inhalt ergeben. Link: ",
-    "EinfachErklaert": "Du bist ein Experte darin, komplexe Themen einfach zu erklären. Fasse den Inhalt des folgenden Links in einfacher Sprache zusammen, so dass es jeder sofort versteht. Nutze AUSSCHLIESSLICH den Text der Seite. Link: "
+    "EinfachErklaert": "Du bist ein Experte darin, komplexe Themen einfach zu erklären. Fasse den Inhalt des folgenden Links in einfacher Sprache zusammen, so dass es jeder sofort versteht. Nutze AUSSCHLIESSLICH den Text der Seite.Link: ",
+"FramingCheck": "Untersuche den Text unter dem Link auf emotionale Beeinflussung (Framing), Vorurteile (Bias) oder Clickbait. Welche Absicht verfolgt der Autor und welche Fakten werden eventuell einseitig dargestellt? Link: ",
+"Brainstormer": "Analysiere den Inhalt des Links und generiere 3 kreative, konkrete Geschäftsideen, Projektansätze oder Anwendungsfälle, wie man diese Informationen praktisch nutzen kann. Link: ",
+"Feynman": "Erkläre das Thema des Links so einfach, dass es ein 5-jähriges Kind versteht. Nutze eine lebendige Analogie oder ein Beispiel aus dem Alltag und verzichte komplett auf Fachbegriffe. Link: ",
 };
 
 function renderLinks() {
@@ -238,6 +244,10 @@ function exportLinks() {
     alert("Backup-Code wurde in die Zwischenablage kopiert! Speichere ihn an einem sicheren Ort. 💾");
 }
 
+function clearCustomContext() {
+    document.getElementById('customContext').value = '';
+    update();
+}
 function moveLink(index, direction) {
     const targetIndex = index + direction;
     if (targetIndex >= 0 && targetIndex < links.length) {
