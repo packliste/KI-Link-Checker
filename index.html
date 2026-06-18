@@ -128,21 +128,31 @@
     <option value="Storyteller">🎭 Der Storyteller</option>
     <option value="CuiBono">🕵️‍♂️ Wer profitiert? (Cui Bono)</option>
 <option value="BullshitFilter">💨 Buzzword- & Bullshit-Filter</option>
+<option value="CulturalTranslator">🌐 Kultur-Dolmetscher</option>
 
 </optgroup>
 
             
             
         </select>
-        
-<button class="btn-share" onclick="share()">Teilen an KI</button>
+       <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 22px; margin-top: fr0px;">
+    <button type="button" onclick="appendTag('⚡ Extrem kurz fassen')" style="background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; font-size: 13px; border-radius: 8px; cursor: pointer;">⚡ Kurz</button>
+    <button type="button" onclick="appendTag('📊 Als übersichtliche Tabelle')" style="background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; font-size: 13px; border-radius: 8px; cursor: pointer;">📊 Tabelle</button>
+    <button type="button" onclick="appendTag('🧠 Fokus auf versteckte Risiken')" style="background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; font-size: 13px; border-radius: 8px; cursor: pointer;">🧠 Risiken</button>
+    <button type="button" onclick="appendTag('🎯 Konkrete Beispiele nennen')" style="background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; font-size: 13px; border-radius: 8px; cursor: pointer;">🎯 Beispiele</button>
+</div>
+
   <label></label>
         <label>Zusatz-Anweisung (optional):</label>
+       
+
+
+       
         <label></label>
         
         
         <input type="text" id="customContext" placeholder="z.B. Fokus auf Kosten, kurz fassen..." oninput="update()">
-        
+        <button class="btn-share" onclick="share()">Teilen an KI</button>
                 <button class="btn-share" onclick="copyToClipboard()" style="background: #475569; margin-top: 10px;">Prompt kopieren</button>
        
       <label></label>
@@ -187,6 +197,7 @@ const roles = {
    "CuiBono": "Analysiere diesen Artikel mit einem detektivischen Blick. Frage dich: 'Cui bono?' – Wer profitiert wirklich von dieser Entwicklung, dieser Nachricht oder diesem Gesetz? Wer verliert dabei? Welche versteckten (wirtschaftlichen oder politischen) Interessen könnten hinter den Kulissen eine Rolle spielen? Link: ",
    "Storyteller": "Verwandle die harten Fakten und Entwicklungen aus diesem Link in eine kurze, packende Alltagsgeschichte oder Parabel. Nutze fiktive Charaktere, um das Problem und die Lösung dieses Artikels bildhaft und spannend zu erklären. Link: ",
    "BullshitFilter": "Du bist ein skeptischer Faktensucher. Filter aus dem folgenden Link sämtliches Marketing-Geschwätz, PR-Hype, Buzzwords und emotionale Übertreibungen heraus. Reduziere den Text radikal auf das, was tatsächlich substanziell, messbar und beweisbar übrig bleibt. Link: ",
+   "CulturalTranslator": "Du bist ein brillanter Kultur-Dolmetscher und Sprachexperte. Übersetze den wesentlichen Inhalt des Links präzise ins Deutsche. Achtung: Übersetze nicht nur stumpf Wort für Wort, sondern passe Redewendungen, Metaphern und Wortwitze so an, dass sie im Deutschen Sinn ergeben. Falls im Text wichtige kulturelle, historische oder politische Hintergründe erwähnt werden, die man als Außenstehender nicht sofort versteht, füge am Ende eine kurze Sektion 'Kultureller Kontext' an, um diese zu erklären. Link: ",
    
     "Analyst": "Du bist ein präziser Analyst. Nutze AUSSCHLIESSLICH den Inhalt des folgenden Links. Liste die 5 wichtigsten Fakten auf. Link: ",
     "FactChecker": "Du bist ein Fact-Checker. Prüfe die Aussagen NUR anhand des Textes. Wenn eine Behauptung nicht belegt ist, markiere sie. Link: ",
@@ -244,6 +255,20 @@ function copyToClipboard() {
 }
 
 function setLink(url) { document.getElementById('url').value = url; update(); }
+
+function appendTag(tagText) {
+    const input = document.getElementById('customContext');
+    // Falls schon was drin steht, hängen wir es mit Komma an, sonst direkt rein
+    if (input.value) {
+        input.value += `, ${tagText}`;
+    } else {
+        input.value = tagText;
+    }
+    update();
+}
+
+
+
 
 function addLink() {
     const name = document.getElementById('newName').value;
