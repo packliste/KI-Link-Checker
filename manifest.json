@@ -1,10 +1,8 @@
-
 {
   "name": "KI Hub",
   "short_name": "KI Hub",
   "start_url": "index.html",
-  "display": "standalone",
- 
+  "display": "standalone", 
   "theme_color": "#1a73e8",
   "icons": [
     {
