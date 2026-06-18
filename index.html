@@ -2,17 +2,28 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-   
-       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
 
-
-<title>KI Hub</title>
+    <title>KI Hub</title>
     <style>
+    /* Styling für das Dropdown-Menü und die Kategorien */
+    optgroup {
+        background: #0f172a;
+        color: #3b82f6;
+        font-weight: 700;
+    }
+    option {
+        color: #fff;
+        background: #1e293b;
+        padding: 12px;
+    }
+
     :root { 
         --bg: #0f172a; --card: #1e293b; --accent: #3b82f6; 
         --text: #f1f5f9; --input-bg: #0f172a; 
     }
+
     body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; display: flex; justify-content: center; }
     .container { max-width: 500px; width: 100%; }
     .card { background: var(--card); padding: 24px; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); margin-bottom: 20px; }
@@ -26,8 +37,27 @@
         box-sizing: border-box; transition: border-color 0.2s;
     }
     input:focus { border-color: var(--accent); outline: none; }
-    
-    .preview { background: #000; padding: 18px; border-radius: 16px; font-size: 15px; color: #cbd5e1; border: 1px solid #334155; white-space: pre-wrap; line-height: 1.5; margin-bottom: 20px; }
+
+    /* Erzeugt einen eleganten Klick-Effekt für alle Buttons und Links */
+    .btn-share:active, .btn-add:active, .btn-copy:active {
+        transform: scale(0.98);
+        filter: brightness(0.9);
+    }
+    .link-item:active {
+        background: #1e293b !important;
+    }    
+    .preview { 
+        background: #020617; 
+        padding: 18px; 
+        border-radius: 16px; 
+        font-size: 15px; 
+        color: #e2e8f0; 
+        border: 2px solid #3b82f6; /* Akzentfarbe als Rahmen */
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.15); /* Subtiler AI-Glow */
+        white-space: pre-wrap; 
+        line-height: 1.5; 
+        margin-bottom: 20px; 
+    }
     
     /* Buttons */
     .btn-share { 
@@ -37,70 +67,75 @@
     }
     .btn-add { background: #10b981; border: none; color: white; padding: 16px; width: 100%; border-radius: 16px; font-weight: 600; cursor: pointer; margin-top: 5px; }
     
-details { width: 100%; }
-summary { cursor: pointer; font-weight: 600; padding: 14px; color: #fff; background: #334155; border-radius: 12px; text-align: center; list-style: none; outline: none; }
-summary::-webkit-details-marker { display: none; } /* Entfernt den Browser-Pfeil */
+    details { width: 100%; }
+    summary { cursor: pointer; font-weight: 600; padding: 14px; color: #fff; background: #334155; border-radius: 12px; text-align: center; list-style: none; outline: none; }
+    summary::-webkit-details-marker { display: none; } /* Entfernt den Browser-Pfeil */
 
-.link-item { display: flex; background: #0f172a; padding: 14px; border-radius: 12px; margin-top: 10px; align-items: center; font-size: 1rem; justify-content: space-between; }
-.link-name { cursor: pointer; flex-grow: 1; }
-.link-open { cursor: pointer; margin-right: 15px; }
-</style>
-
+    .link-item { display: flex; background: #0f172a; padding: 14px; border-radius: 12px; margin-top: 10px; align-items: center; font-size: 1rem; justify-content: space-between; }
+    .link-name { cursor: pointer; flex-grow: 1; }
+    .link-open { cursor: pointer; margin-right: 15px; }
+    .del-btn { color: #f87171; padding: 0 10px; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
 <body>
 
 <div class="container">
     <div class="card">
-        <h2>AI Content Hub</h2>
+        <h2>KI Content Hub</h2>
         <label>Paste Seiten-URL:</label>
         <input type="url" id="url" placeholder="https://..." oninput="update()" onclick="this.select()">
         
         <label>Rolle wählen:</label>
         <select id="role" onchange="update()">
             <optgroup label="-----Analyse & Fakten-----">
-	
-            </optgroup>
-<option value="EinfachErklaert">💬 Einfach Erklärt</option>
+                <option value="EinfachErklaert">💬 Einfach Erklärt</option>
                 <option value="Analyst">🔍 Präzisions-Analyst</option>
                 <option value="FactChecker">⚖️ Fact-Checker</option>
+                <option value="DevilsAdvocate">😈 Gegenargumente (Kritischer Blick)</option>
                 <option value="TitleCheck">🧾 Titel-Check (Passend zur Überschrift?)</option>
             </optgroup>
 
-
-
-
             <optgroup label="-----Briefing & Journalismus-----">
                 <option value="Journalist">📰 Redaktions-Chef</option>
-                <option value="Briefing">⚡ Executive Briefing</option>
+                <option value="Briefing">⚡ Executive-Briefing</option>
+                <option value="SocialMedia">📱 Social Media Post (LI & X)</option>
             </optgroup>
 
-
-
-
-
-
-
-            <optgroup label="-----Multimedia & Deep Dive">
+            <optgroup label="-----Multimedia & Deep Dive-----">
                 <option value="VideoSummary">🎬 Video-Zusammenfasser</option>
                 <option value="NetCheck">🌐 Internet-Abgleich & Kontext</option>
+                <option value="ActionItems">✅ To-Do & Action Items</option>
             </optgroup>
         </select>
 
+        <label>Zusatz-Anweisung (optional):</label>
+        <input type="text" id="customContext" placeholder="z.B. Fokus auf Kosten, kurz fassen..." oninput="update()">
+        
         <div class="preview" id="preview"></div>
         <button class="btn-share" onclick="share()">Teilen an KI</button>
+        <button class="btn-share" onclick="copyToClipboard()" style="background: #475569; margin-top: 10px;">Prompt kopieren</button>
     </div>
 
-<div class="card">
-    <details>
-        <summary>⭐ Favoriten verwalten (Klicken)</summary>
-        <div style="margin-top: 20px;">
-            <input type="text" id="newName" placeholder="Name">
-            <input type="url" id="newUrl" placeholder="https://...">
-            <button class="btn-add" onclick="addLink()">+ Favorit hinzufügen</button>
-            <div class="quick-links" id="quickLinksContainer"></div>
-        </div>
-    </details>
-</div>
+    <div class="card">
+        <details>
+            <summary>⭐ Favoriten verwalten</summary>
+            <div style="margin-top: 20px;">
+                <input type="text" id="newName" placeholder="Name">
+                <input type="url" id="newUrl" placeholder="https://...">
+                <button class="btn-add" onclick="addLink()">+ Favorit hinzufügen</button>
+                <div class="quick-links" id="quickLinksContainer"></div>
+                
+                <div style="margin-top: 20px; border-top: 1px solid #334155; padding-top: 15px;">
+                    <label style="font-size: 0.8rem;">Backup & Synchronisation:</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <button type="button" onclick="exportLinks()" style="background: #475569; border: none; color: white; padding: 10px; flex: 1; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px;">📤 Exportieren</button>
+                        <button type="button" onclick="importLinks()" style="background: #475569; border: none; color: white; padding: 10px; flex: 1; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px;">📥 Importieren</button>
+                    </div>
+                    <input type="text" id="backupData" placeholder="Backup-Code hier einfügen für Import..." style="padding: 12px; font-size: 14px; margin-bottom: 0;">
+                </div>
+            </div>
+        </details>
+    </div>
 </div>
 
 <script>
@@ -114,9 +149,10 @@ const roles = {
     "Briefing": "Erstelle ein 'Executive Briefing'. Nutze ausschließlich den Text. Max. 3 Sätze. Link: ",
     "VideoSummary": "Fasse das Video unter diesem Link zusammen, inkl. wichtiger Zeitmarken. Nutze nur den Inhalt. Link: ",
     "NetCheck": "Analysiere den Inhalt des Links und gleiche die Aussagen mit aktuellen Informationen aus dem Internet ab. Was ist neu? Was ist strittig? Welche Perspektiven fehlen? Link: ",
-// ... füge diesen Eintrag zu deinem 'roles' Objekt hinzu:
-"EinfachErklaert": "Du bist ein Experte darin, komplexe Themen einfach zu erklären. Fasse den Inhalt des folgenden Links in einfacher Sprache zusammen, so dass es jeder sofort versteht. Nutze AUSSCHLIESSLICH den Text der Seite. Link: ",
-
+    "DevilsAdvocate": "Du bist ein kritischer Denker. Analysiere den Text unter dem Link und liefere die 3 stärksten Gegenargumente oder Schwachstellen in der Argumentation des Autors. Link: ",
+    "SocialMedia": "Schreibe basierend auf dem Link einen packenden LinkedIn-Post (inkl. passender Hashtags) und einen kurzen Tweet (max. 280 Zeichen), der die Kernbotschaft zusammenfasst. Link: ",
+    "ActionItems": "Lies den Text und erstelle eine übersichtliche, nach Priorität sortierte To-Do-Liste mit konkreten Handlungsschritten (Action Items), die sich aus dem Inhalt ergeben. Link: ",
+    "EinfachErklaert": "Du bist ein Experte darin, komplexe Themen einfach zu erklären. Fasse den Inhalt des folgenden Links in einfacher Sprache zusammen, so dass es jeder sofort versteht. Nutze AUSSCHLIESSLICH den Text der Seite. Link: "
 };
 
 function renderLinks() {
@@ -125,37 +161,122 @@ function renderLinks() {
     links.forEach((link, index) => {
         const div = document.createElement('div');
         div.className = 'link-item';
-        div.innerHTML = `<div class="link-name" onclick="setLink('${link.url}')">${link.name}</div>
-                         <div class="link-open" onclick="window.open('${link.url}', '_blank')">↗</div>
-                         <div class="del-btn" onclick="removeLink(${index})">✕</div>`;
+        div.innerHTML = `
+            <div style="display: flex; gap: 5px; margin-right: 10px;">
+                <span style="cursor:pointer;" onclick="moveLink(${index}, -1)">▲</span>
+                <span style="cursor:pointer;" onclick="moveLink(${index}, 1)">▼</span>
+            </div>
+            <div class="link-name" onclick="setLink('${link.url}')">${link.name}</div>
+            <div class="link-open" onclick="window.open('${link.url}', '_blank')">↗</div>
+            <div class="del-btn" onclick="removeLink(${index})">✕</div>`;
         container.appendChild(div);
     });
     localStorage.setItem('myLinks', JSON.stringify(links));
 }
 
+// ...UND DURCH DIESEN ERSETZEN
+function copyToClipboard() {
+    const text = document.getElementById('preview').innerText;
+    navigator.clipboard.writeText(text);
+    
+    // Holt den Button, der geklickt wurde
+    const btn = document.querySelector('.btn-share[onclick="copyToClipboard()"]');
+    if (btn) {
+        const originalText = btn.innerHTML;
+        const originalBg = btn.style.background;
+        
+        // Button verändern
+        btn.innerHTML = "✅ Erfolgreich kopiert!";
+        btn.style.background = "#10b981"; // Wechselt zu Grün
+        
+        // Nach 2 Sekunden wieder zurücksetzen
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = originalBg;
+        }, 2000);
+    }
+}
+
 function setLink(url) { document.getElementById('url').value = url; update(); }
+
 function addLink() {
     const name = document.getElementById('newName').value;
     const url = document.getElementById('newUrl').value;
-    if(name && url) { links.push({name, url}); renderLinks(); }
+    if(name && url) { 
+        links.push({name, url}); 
+        renderLinks(); 
+        document.getElementById('newName').value = '';
+        document.getElementById('newUrl').value = '';
+    }
 }
+
 function removeLink(index) { links.splice(index, 1); renderLinks(); }
+
 function update() {
     const url = document.getElementById('url').value;
     const role = document.getElementById('role').value;
-    document.getElementById('preview').innerText = roles[role] + (url || "https://www.google.de");
+    const context = document.getElementById('customContext').value;
+    
+    let prompt = roles[role] + (url || "https://...");
+    if (context) {
+        prompt += `\nBeachte zusätzlich folgende Anweisung: ${context}`;
+    }
+    document.getElementById('preview').innerText = prompt;
 }
+
 async function share() {
     const text = document.getElementById('preview').innerText;
     if (navigator.share) await navigator.share({text: text});
 }
 
-Object.keys(roles).forEach(r => {
-    let opt = document.createElement('option');
-    opt.value = r; opt.innerHTML = r;
-    document.getElementById('role').appendChild(opt);
-});
+function exportLinks() {
+    const backupString = JSON.stringify(links);
+    const backupInput = document.getElementById('backupData');
+    backupInput.value = backupString;
+    backupInput.select();
+    navigator.clipboard.writeText(backupString);
+    alert("Backup-Code wurde in die Zwischenablage kopiert! Speichere ihn an einem sicheren Ort. 💾");
+}
 
+function moveLink(index, direction) {
+    const targetIndex = index + direction;
+    if (targetIndex >= 0 && targetIndex < links.length) {
+        const temp = links[index];
+        links[index] = links[targetIndex];
+        links[targetIndex] = temp;
+        renderLinks();
+    }
+}
+
+function importLinks() {
+    const inputData = document.getElementById('backupData').value.trim();
+    if (!inputData) {
+        alert("Bitte füge zuerst einen gültigen Backup-Code in das Textfeld ein.");
+        return;
+    }
+    
+    try {
+        const parsed = JSON.parse(inputData);
+        if (Array.isArray(parsed)) {
+            if (confirm(`Möchtest du wirklich ${parsed.length} Favoriten importieren? Deine aktuellen Favoriten werden dabei überschrieben.`)) {
+                links = parsed;
+                
+                const searchInput = document.getElementById('searchLinks');
+                if (searchInput) searchInput.value = "";
+                
+                renderLinks();
+                document.getElementById('backupData').value = "";
+                alert("Favoriten erfolgreich wiederhergestellt! 🎉");
+            }
+        } else {
+            alert("Ungültiges Backup-Format. Bitte überprüfe den Code.");
+        }
+    } catch (e) {
+        alert("Fehler beim Importieren. Der Code ist fehlerhaft oder unvollständig.");
+    }
+}
+
+// Skript-Generierung für Optionen entfernt, da diese fest im HTML-Select stehen
 renderLinks();
 update();
 </script>
