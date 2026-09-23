@@ -2,421 +2,1057 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#0b0d12" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f3f4f8" media="(prefers-color-scheme: light)">
     <link rel="manifest" href="manifest.json">
 
     <title>KI Hub</title>
     <style>
-    /* Styling für das Dropdown-Menü und die Kategorien */
-    optgroup {
-        background: #0f172a;
-        color: #3b82f6;
-        font-weight: 700;
+    :root {
+        color-scheme: dark;
+        --bg: #0b0d12; --surface: #141821; --field: #1b202b; --field-2: #252b39;
+        --text: #eef1f6; --soft: #c3cad6; --muted: #8a92a3; --line: rgba(255,255,255,0.07);
+        --accent: #5b7fff; --accent-text: #8fa8ff; --accent-soft: rgba(91,127,255,0.20); --danger: #ff7a7a;
     }
-    option {
-        color: #fff;
-        background: #1e293b;
-        padding: 12px;
-    }
-
-    :root { 
-        --bg: #0f172a; --card: #1e293b; --accent: #3b82f6; 
-        --text: #f1f5f9; --input-bg: #0f172a; 
+    @media (prefers-color-scheme: light) {
+        :root {
+            color-scheme: light;
+            --bg: #f3f4f8; --surface: #ffffff; --field: #eceef3; --field-2: #e1e4eb;
+            --text: #12151c; --soft: #3a4150; --muted: #6a7282; --line: rgba(15,20,35,0.09);
+            --accent: #3b5bdb; --accent-text: #3b5bdb; --accent-soft: rgba(59,91,219,0.12); --danger: #d22f2f;
+        }
     }
 
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; display: flex; justify-content: center; }
-    .container { max-width: 500px; width: 100%; }
-    .card { background: var(--card); padding: 24px; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); margin-bottom: 20px; }
-    h2 { margin: 0 0 20px 0; text-align: center; font-weight: 700; color: #fff; }
-    label { display: block; margin-bottom: 10px; font-size: 0.9rem; color: #94a3b8; font-weight: 500; }
-    
-    input, select { 
-        width: 100%; padding: 18px; margin-bottom: 20px; 
-        border-radius: 16px; border: 2px solid #334155; 
-        background: var(--input-bg); color: #fff; font-size: 16px; 
-        box-sizing: border-box; transition: border-color 0.2s;
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+        margin: 0; background: var(--bg); color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, Roboto, sans-serif;
+        font-size: 16px; line-height: 1.4;
+        padding: max(22px, env(safe-area-inset-top, 0px)) 20px 130px;
     }
-    input:focus { border-color: var(--accent); outline: none; }
+    .app { max-width: 520px; margin: 0 auto; }
+    h1 { font-size: 30px; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; margin: 6px 0 26px 2px; }
+    h3 { font-size: 17px; font-weight: 650; margin: 0 0 14px 0; }
+    .field { margin-bottom: 26px; }
+    label { display: block; font-size: 13px; font-weight: 550; color: var(--muted); margin: 0 0 8px 2px; }
+    .opt { font-weight: 400; opacity: 0.8; margin-left: 4px; }
 
-    /* Erzeugt einen eleganten Klick-Effekt für alle Buttons und Links */
-    .btn-share:active, .btn-add:active, .btn-copy:active {
-        transform: scale(0.98);
-        filter: brightness(0.9);
+    input[type="url"], input[type="text"], select, textarea {
+        width: 100%; padding: 15px 16px; border-radius: 14px; border: 1px solid transparent;
+        background: var(--field); color: var(--text); font: inherit; font-size: 16px;
+        transition: box-shadow .15s, background .15s;
     }
-    .link-item:active {
-        background: #1e293b !important;
-    }    
-    .preview { 
-        background: #020617; 
-        padding: 18px; 
-        border-radius: 16px; 
-        font-size: 15px; 
-        color: #e2e8f0; 
-        border: 2px solid #3b82f6; /* Akzentfarbe als Rahmen */
-        box-shadow: 0 0 15px rgba(59, 130, 246, 0.15); /* Subtiler AI-Glow */
-        white-space: pre-wrap; 
-        line-height: 1.5; 
-        margin-bottom: 20px; 
+    input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.8; }
+    input:focus, select:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px var(--accent); }
+    select {
+        -webkit-appearance: none; appearance: none; padding-right: 46px; cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1.5l6 6 6-6' fill='none' stroke='%238a92a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: right 18px center;
     }
-    
-    /* Buttons */
-    .btn-share { 
-        display: block; width: 100%; padding: 18px; border-radius: 16px; 
-        background: var(--accent); color: white; font-weight: 600; text-align: center; 
-        text-decoration: none; font-size: 16px; box-sizing: border-box;
+    textarea { resize: vertical; min-height: 200px; line-height: 1.5; }
+    button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    button { font-family: inherit; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+    /* Schaltflächen */
+    .btn-primary {
+        width: 100%; height: 54px; border: none; border-radius: 16px; background: var(--accent); color: #fff;
+        font-size: 17px; font-weight: 650; cursor: pointer; transition: transform .1s, opacity .15s;
     }
-    .btn-add { background: #10b981; border: none; color: white; padding: 16px; width: 100%; border-radius: 16px; font-weight: 600; cursor: pointer; margin-top: 5px; }
-    
-    details { width: 100%; }
-    summary { cursor: pointer; font-weight: 600; padding: 14px; color: #fff; background: #334155; border-radius: 12px; text-align: center; list-style: none; outline: none; }
-    summary::-webkit-details-marker { display: none; } /* Entfernt den Browser-Pfeil */
+    .btn-primary:active { transform: scale(0.985); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-soft { border: none; border-radius: 12px; background: var(--field); color: var(--text); font-size: 15px; font-weight: 550; padding: 12px 14px; cursor: pointer; }
+    .btn-soft:active { background: var(--field-2); }
+    .btn-text { border: none; background: none; color: var(--accent-text); font-size: 14px; font-weight: 600; padding: 6px 2px; cursor: pointer; }
+    .btn-text.danger { color: var(--danger); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stack > * + * { margin-top: 10px; }
+    .text-actions { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 14px; }
 
-    .link-item { display: flex; background: #0f172a; padding: 14px; border-radius: 12px; margin-top: 10px; align-items: center; font-size: 1rem; justify-content: space-between; }
-    .link-name { cursor: pointer; flex-grow: 1; }
-    .link-open { cursor: pointer; margin-right: 15px; }
-    .del-btn { color: #f87171; padding: 0 10px; font-weight: bold; cursor: pointer; }
+    /* Feld-Kopfzeile */
+    .label-row { display: flex; align-items: center; justify-content: space-between; min-height: 30px; margin-bottom: 4px; }
+    .label-row label { margin: 0; }
+    .label-row .btn-text { margin-left: auto; }
+    .count:empty { display: none; }
+    .label-row .count { margin-left: auto; }
+    .count { font-size: 13px; color: var(--muted); }
 
-    /* Einheitliche Auswahl-Fenster (Rolle, Vorschau, Favoriten) */
-    .pick { margin-bottom: 20px; }
-    .pick-list { margin-top: 10px; max-height: 340px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-    .role-group { color: var(--accent); font-weight: 700; font-size: 0.85rem; margin: 16px 4px 2px; }
-    .role-group:first-child { margin-top: 4px; }
-    .role-opt { background: #0f172a; padding: 14px; border-radius: 12px; margin-top: 8px; cursor: pointer; font-size: 1rem; }
-    .role-opt:active { background: #1e293b; }
-    .role-opt.selected { box-shadow: inset 0 0 0 2px var(--accent); }
+    /* Pillen (Favoriten, Tags, Rollen) */
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    #favChips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-top: 10px; }
+    #favChips::-webkit-scrollbar { display: none; }
+    .pill, .chip {
+        display: inline-flex; align-items: center; gap: 7px; border: none; background: var(--field); color: var(--soft);
+        font-size: 14px; font-weight: 500; padding: 9px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; flex: none;
+    }
+    .pill:active, .chip:active { background: var(--field-2); }
+    .pill.on, .chip.on { background: var(--accent-soft); color: var(--accent-text); }
+    #comboBox { max-height: 300px; overflow-y: auto; margin-bottom: 4px; }
+    #comboBox .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { white-space: normal; text-align: left; }
+    .cat { font-size: 13px; font-weight: 600; color: var(--muted); margin: 14px 0 8px 2px; }
+    .cat:first-child { margin-top: 4px; }
+    .num { background: var(--accent); color: #fff; border-radius: 50%; width: 19px; height: 19px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+    .note { font-size: 13px; color: var(--muted); margin: 8px 2px 0; }
 
-    /* Schnell-Tags über volle Breite */
-    .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
-    .tags button { flex: 1 1 auto; background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(255,255,255,0.1); padding: 10px 8px; font-size: 13px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
-    .tags button:active { transform: scale(0.98); filter: brightness(0.9); }
+    /* Schalter (wie in iOS) */
+    .switch-row { display: flex; align-items: center; justify-content: space-between; margin: 14px 2px 0; font-size: 15px; font-weight: 500; color: var(--text); cursor: pointer; }
+    .switch input { -webkit-appearance: none; appearance: none; position: relative; width: 51px; height: 31px; margin: 0; border-radius: 999px; background: var(--field-2); cursor: pointer; transition: background .2s; display: block; }
+    .switch input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: transform .2s; }
+    .switch input:checked { background: var(--accent); }
+    .switch input:checked::after { transform: translateX(20px); }
 
-    /* Vorschau: feste Höhe, nur Inhalt scrollt */
-    details .preview { height: 220px; overflow-y: auto; margin: 10px 0 0 0; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
+    /* Vorschau */
+    .preview-wrap { position: relative; background: var(--surface); border-radius: 18px; padding: 16px 18px; }
+    .preview { font-size: 14.5px; line-height: 1.55; color: var(--soft); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .preview-wrap.long { cursor: pointer; }
+    .preview-wrap.collapsed { padding-bottom: 52px; }
+    .preview-wrap.collapsed .preview { max-height: 7.6em; overflow: hidden; -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
+    .more { display: none; position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: var(--field-2); color: var(--text); font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 999px; pointer-events: none; }
+    .preview-wrap.collapsed .more { display: block; }
+
+    /* Einstellungen als Liste */
+    .settings { background: var(--surface); border-radius: 20px; overflow: hidden; }
+    .settings details + details { border-top: 1px solid var(--line); }
+    .settings summary { display: flex; align-items: center; justify-content: space-between; padding: 17px 18px; font-size: 16px; font-weight: 550; cursor: pointer; list-style: none; }
+    .settings summary::-webkit-details-marker { display: none; }
+    .settings summary::after { content: ''; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(-45deg); transition: transform .2s; margin-right: 4px; }
+    .settings details[open] > summary::after { transform: rotate(45deg); }
+    .settings .inner { padding: 2px 18px 20px; }
+    .settings input[type="url"], .settings input[type="text"], .settings textarea { background: var(--field); margin-bottom: 12px; }
+
+    .link-item { display: flex; align-items: center; gap: 4px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+    .link-item:last-child { border-bottom: none; }
+    .link-name { flex: 1; cursor: pointer; overflow-wrap: anywhere; }
+    .icon { border: none; background: none; color: var(--muted); width: 36px; height: 36px; border-radius: 10px; font-size: 16px; cursor: pointer; }
+    .icon:active { background: var(--field); }
+    .icon:disabled { opacity: 0.25; cursor: default; }
+    .icon:disabled:active { background: none; }
+    .badge { font-size: 11px; font-weight: 600; color: var(--accent-text); background: var(--accent-soft); border-radius: 6px; padding: 2px 7px; margin-left: 8px; }
+    #roleList { max-height: 320px; overflow-y: auto; margin-bottom: 14px; }
+    #roleEditor { display: none; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .ph-row { display: flex; gap: 6px; flex-wrap: wrap; margin: -2px 0 10px; }
+    .ph { border: none; background: var(--field); color: var(--accent-text); padding: 6px 10px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: ui-monospace, Menlo, Consolas, monospace; }
+
+    /* Aktionsleiste */
+    .actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding: 28px 20px calc(14px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--bg) 55%, transparent); pointer-events: none; }
+    .actionbar-inner { max-width: 520px; margin: 0 auto; pointer-events: auto; }
+
+    /* Hinweis */
+    #toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(8px); background: var(--text); color: var(--bg); padding: 11px 18px; border-radius: 999px; font-size: 14px; font-weight: 550; max-width: 88%; text-align: center; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 20; }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="card">
-        <h2>KI Content Hub</h2>
-        <label>Paste Seiten-URL:</label>
-        <input type="url" id="url" placeholder="https://..." oninput="update()" onclick="this.select()">
-        
-        <label>Rolle wählen:</label>
-        <details class="pick" id="roleDetails">
-            <summary id="roleSummary">💬 Einfach-Erklärt</summary>
-            <div class="pick-list" id="roleList">
-                <div class="role-group">Analyse &amp; Fakten</div>
-                <div class="role-opt selected" data-value="EinfachErklaert">💬 Einfach-Erklärt</div>
-                <div class="role-opt" data-value="Analyst">🔍 Präzisions-Analyst</div>
-                <div class="role-opt" data-value="FactChecker">⚖️ Fact-Checker</div>
-                <div class="role-opt" data-value="DevilsAdvocate">😈 Gegenargumente</div>
-                <div class="role-opt" data-value="TitleCheck">🧾 Titel-Check</div>
-                <div class="role-opt" data-value="Mentors">🧠 3-Mentoren-Feedback</div>
-                <div class="role-opt" data-value="Infographic">📊 Infografik-Bauplan</div>
-                <div class="role-opt" data-value="TimeCapsule">⏳ Zeitkapsel (Blick aus 2076)</div>
-                <div class="role-group">Briefing &amp; Journalismus</div>
-                <div class="role-opt" data-value="PaywallBuster">🔓 Paywall-Buster (Kontext-Suche)</div>
-                <div class="role-opt" data-value="Journalist">📰 Redaktions-Chef</div>
-                <div class="role-opt" data-value="Briefing">⚡ Executive-Briefing</div>
-                <div class="role-opt" data-value="SocialMedia">📱 Social Media Post</div>
-                <div class="role-group">Multimedia &amp; Deep Dive</div>
-                <div class="role-opt" data-value="VideoSummary">🎬 Video-Zusammenfasser</div>
-                <div class="role-opt" data-value="NetCheck">🌐 Internet-Abgleich &amp; Kontext</div>
-                <div class="role-opt" data-value="ActionItems">✅ To-Do &amp; Action Items</div>
-                <div class="role-group">Privat-Nutzen &amp; Finanzen</div>
-                <div class="role-opt" data-value="TrendInvestor">💰 Geldanlage- &amp; Depot-Radar</div>
-                <div class="role-opt" data-value="Sparring">🥊 Sokratischer Sparringspartner</div>
-                <div class="role-opt" data-value="CareerCheck">💼 Job- &amp; Karriere-Schutz</div>
-                <div class="role-opt" data-value="BudgetCheck">🛒 Alltags-Budget &amp; Inflation</div>
-                <div class="role-group">Kreativ</div>
-                <div class="role-opt" data-value="Storyteller">🎭 Der Storyteller</div>
-                <div class="role-opt" data-value="CuiBono">🕵️‍♂️ Wer profitiert? (Cui Bono)</div>
-                <div class="role-opt" data-value="BullshitFilter">💨 Buzzword- &amp; Bullshit-Filter</div>
-                <div class="role-opt" data-value="360-Text-Analyzer">🌐 360 Text-Analyzer</div>
-            </div>
-        </details>
-        <input type="hidden" id="role" value="EinfachErklaert">
+<main class="app">
+    <h1>KI Hub</h1>
 
-        <div class="tags">
-            <button type="button" onclick="appendTag('⚡ Extrem kurz fassen')">⚡ Kurz</button>
-            <button type="button" onclick="appendTag('📊 Als übersichtliche Tabelle')">📊 Tabelle</button>
-            <button type="button" onclick="appendTag('🧠 Fokus auf versteckte Risiken')">🧠 Risiken</button>
-            <button type="button" onclick="appendTag('🎯 Konkrete Beispiele nennen')">🎯 Beispiele</button>
+    <!-- Link -->
+    <section class="field">
+        <label for="url">Link</label>
+        <input type="url" id="url" placeholder="https://…" oninput="update()" onclick="this.select()" autocomplete="off" autocapitalize="off" inputmode="url">
+        <div class="pills" id="favChips"></div>
+    </section>
+
+    <!-- Rolle -->
+    <section class="field">
+        <div class="label-row">
+            <label for="role" id="roleLabel">Rolle</label>
+            <button type="button" class="btn-text" id="btnEditRole" onclick="editSelectedRole()">Bearbeiten</button>
+            <span class="count" id="comboCount"></span>
         </div>
+        <div id="singleBox"><select id="role" onchange="onRoleChange()"></select></div>
+        <div id="comboWrap" style="display:none;">
+            <div id="comboBox"></div>
+            <div class="note" id="comboHint"></div>
+        </div>
+        <label class="switch-row"><span>Mehrere Rollen kombinieren</span><span class="switch"><input type="checkbox" id="comboToggle" onchange="setMode()"></span></label>
+    </section>
 
-        <label>Zusatz-Anweisung (optional):</label>
-        <input type="text" id="customContext" placeholder="z.B. Fokus auf Kosten, kurz fassen..." oninput="update()">
+    <!-- Zusatz -->
+    <section class="field">
+        <label for="customContext">Zusatz-Anweisung <span class="opt">optional</span></label>
+        <input type="text" id="customContext" placeholder="z. B. Fokus auf Kosten, Vergleich mit 2020" oninput="update()">
+        <div class="pills">
+            <button type="button" class="pill" data-tag="⚡ Extrem kurz fassen" onclick="toggleTag(this.dataset.tag)">Kurz</button>
+            <button type="button" class="pill" data-tag="📊 Als übersichtliche Tabelle" onclick="toggleTag(this.dataset.tag)">Tabelle</button>
+            <button type="button" class="pill" data-tag="🧠 Fokus auf versteckte Risiken" onclick="toggleTag(this.dataset.tag)">Risiken</button>
+            <button type="button" class="pill" data-tag="🎯 Konkrete Beispiele nennen" onclick="toggleTag(this.dataset.tag)">Beispiele</button>
+        </div>
+    </section>
 
-        <button class="btn-share" onclick="share()">Teilen an KI</button>
-        <button class="btn-share" onclick="copyToClipboard()" style="background: #475569; margin-top: 10px;">Prompt kopieren</button>
-
-        <details class="pick" style="margin-top: 20px; margin-bottom: 0;">
-            <summary>👁 Vorschau anzeigen</summary>
+    <!-- Vorschau -->
+    <section class="field">
+        <label>Vorschau</label>
+        <div class="preview-wrap" id="previewWrap" onclick="togglePreview()">
             <div class="preview" id="preview"></div>
-        </details>
-    </div>
+            <span class="more">Mehr anzeigen</span>
+        </div>
+    </section>
 
-    <div class="card">
+    <!-- Einstellungen -->
+    <div class="settings">
         <details>
-            <summary>⭐ Einstellungen</summary>
-            <div style="margin-top: 20px;">
-                <input type="text" id="newName" placeholder="Name">
-                <input type="url" id="newUrl" placeholder="https://...">
-                <button class="btn-add" onclick="addLink()">+ Favorit hinzufügen</button>
-                <div class="quick-links" id="quickLinksContainer"></div>
-                
-                <div style="margin-top: 20px; border-top: 1px solid #334155; padding-top: 15px;">
-                    <label style="font-size: 0.8rem;">Backup & Synchronisation:</label>
-                    <div style="display: flex; gap: 10px;">
-                        <button type="button" onclick="exportLinks()" style="background: #475569; border: none; color: white; padding: 12px; flex: 1; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px;">📤 Sichern</button>
-                        <button type="button" onclick="importLinks()" style="background: #475569; border: none; color: white; padding: 12px; flex: 1; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px;">📥 Wiederherstellen</button>
-                    </div>
-                    <input type="file" id="backupFile" accept=".json,application/json,text/plain" onchange="handleImportFile(this)" style="display: none;">
+            <summary>Favoriten</summary>
+            <div class="inner">
+                <div id="quickLinksContainer"></div>
+                <div class="stack" style="margin-top:14px;">
+                    <input type="text" id="newName" placeholder="Name" style="margin:0;">
+                    <input type="url" id="newUrl" placeholder="https://…" style="margin:0;">
+                    <button type="button" class="btn-soft" style="width:100%;" onclick="addLink()">Favorit hinzufügen</button>
                 </div>
             </div>
         </details>
+
+        <details id="rolesDetails">
+            <summary>Rollen &amp; Prompts</summary>
+            <div class="inner">
+                <div class="note" style="margin:0 0 6px 0;">Tippe eine Rolle zum Bearbeiten. Mit ↑ ↓ sortierst du sie innerhalb ihrer Kategorie.</div>
+                <div id="roleList"></div>
+                <button type="button" class="btn-soft" style="width:100%;" onclick="openEditor(null)">Neue Rolle</button>
+
+                <div id="roleEditor">
+                    <h3 id="edTitle">Rolle bearbeiten</h3>
+                    <label for="edName">Name</label>
+                    <input type="text" id="edName" placeholder="z. B. 🧪 Studien-Check">
+                    <label for="edCategory">Kategorie</label>
+                    <input type="text" id="edCategory" list="catList" placeholder="z. B. Eigene Rollen">
+                    <datalist id="catList"></datalist>
+                    <label for="edPrompt">Prompt</label>
+                    <textarea id="edPrompt" placeholder="Was soll die KI mit dem Link tun?"></textarea>
+                    <div class="ph-row">
+                        <button type="button" class="ph" onclick="insertPlaceholder('{{url}}')">{{url}}</button>
+                        <button type="button" class="ph" onclick="insertPlaceholder('{{zusatz}}')">{{zusatz}}</button>
+                        <button type="button" class="ph" onclick="insertPlaceholder('{{datum}}')">{{datum}}</button>
+                    </div>
+                    <div class="note" style="margin:0 0 16px 0;">
+                        {{url}} = Link, {{zusatz}} = Zusatz-Anweisung, {{datum}} = heutiges Datum. Fehlt {{url}} oder {{zusatz}}, wird beides automatisch am Ende angehängt.
+                    </div>
+                    <button type="button" class="btn-primary" id="btnSave" style="height:48px; font-size:16px;" onclick="saveRole()">Speichern</button>
+                    <div class="text-actions">
+                        <button type="button" class="btn-text" id="btnCancel" onclick="closeEditor()">Abbrechen</button>
+                        <button type="button" class="btn-text" id="btnDup" onclick="duplicateRole()">Duplizieren</button>
+                        <button type="button" class="btn-text" id="btnReset" onclick="resetRole()">Auf Standard zurücksetzen</button>
+                        <button type="button" class="btn-text danger" id="btnDelete" onclick="deleteRole()">Löschen</button>
+                    </div>
+                </div>
+
+                <div class="text-actions" style="margin-top:20px; padding-top:16px; border-top:1px solid var(--line);">
+                    <button type="button" class="btn-text" id="btnRestoreHidden" onclick="restoreHidden()">Ausgeblendete zurückholen</button>
+                    <button type="button" class="btn-text" id="btnResetOrder" onclick="resetOrder()">Reihenfolge zurücksetzen</button>
+                    <button type="button" class="btn-text danger" onclick="resetAllRoles()">Alle Rollen zurücksetzen</button>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary>Backup</summary>
+            <div class="inner">
+                <div class="note" style="margin:0 0 14px 0;">Enthält Favoriten, eigene Rollen und alle Prompt-Änderungen.</div>
+                <div class="grid2">
+                    <button type="button" class="btn-soft" onclick="exportBackup()">Code kopieren</button>
+                    <button type="button" class="btn-soft" onclick="downloadBackup()">Als Datei speichern</button>
+                </div>
+                <input type="text" id="backupData" placeholder="Backup-Code zum Importieren einfügen" style="margin:12px 0;">
+                <div class="grid2">
+                    <button type="button" class="btn-soft" onclick="importFromField()">Aus Code importieren</button>
+                    <button type="button" class="btn-soft" onclick="document.getElementById('backupFile').click()">Datei laden</button>
+                </div>
+                <input type="file" id="backupFile" accept=".json,application/json" style="display:none" onchange="importFromFile(this)">
+            </div>
+        </details>
+    </div>
+</main>
+
+<div class="actionbar">
+    <div class="actionbar-inner">
+        <button class="btn-primary" id="btnShare" onclick="share()">An KI senden</button>
     </div>
 </div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script>
-let links = JSON.parse(localStorage.getItem('myLinks')) || [{ name: "DLF Presseschau", url: "https://www.deutschlandfunk.de/presseschauen-100.html" }];
+/* ============================================================
+   STANDARD-ROLLEN  (id, Name, Kategorie, Prompt-Vorlage)
+   Platzhalter: {{url}}  {{zusatz}}  {{datum}}
+   ============================================================ */
+const DEFAULT_ROLES = [
+ {
+  "id": "EinfachErklaert",
+  "name": "💬 Einfach-Erklärt",
+  "category": "Analyse & Fakten",
+  "prompt": "Du bist ein Experte darin, komplexe Themen einfach zu erklären. Fasse den Inhalt des folgenden Links in einfacher Sprache zusammen, so dass es jeder sofort versteht. Nutze AUSSCHLIESSLICH den Text der Seite. Link: {{url}}"
+ },
+ {
+  "id": "Analyst",
+  "name": "🔍 Präzisions-Analyst",
+  "category": "Analyse & Fakten",
+  "prompt": "Du bist ein präziser Analyst. Nutze AUSSCHLIESSLICH den Inhalt des folgenden Links. Liste die 5 wichtigsten Fakten auf. Link: {{url}}"
+ },
+ {
+  "id": "FactChecker",
+  "name": "⚖️ Fact-Checker",
+  "category": "Analyse & Fakten",
+  "prompt": "Du bist ein Fact-Checker. Prüfe die Aussagen NUR anhand des Textes. Wenn eine Behauptung nicht belegt ist, markiere sie. Link: {{url}}"
+ },
+ {
+  "id": "TrendVergleich",
+  "name": "🕰️ Früher vs. Heute (Trendvergleich)",
+  "category": "Analyse & Fakten",
+  "prompt": "Du bist ein präziser Fakten- und Trendanalyst. Deine Aufgabe ist es, einen aktuellen Text/Artikel mit Aussagen oder Wissensständen aus der Vergangenheit zu vergleichen und Veränderungen transparent zu machen.\n\n### 1. ZIEL DER ANALYSE\nUntersuche den bereitgestellten Text auf Kontraste, Entwicklungen oder Veralterungen im Vergleich zu früheren Aussagen/Kenntnissen im gleichen Themenfeld. Arbeite dich dabei strikt an den Fakten ab: Belege jede Veränderung mit konkreten Aussagen aus dem Text und kennzeichne Einschätzungen aus deinem Vorwissen ausdrücklich als solche.\n\n### 2. INPUT-DATEN\n- **Aktueller Artikel / Text (Link oder Inhalt):** {{url}}\n\n- **Vergleichszeitraum / Historischer Kontext:**\n  Falls am Ende eine zusätzliche Anweisung mit einem Zeitraum steht (z. B. „Vergleiche mit dem Wissensstand von vor 5 Jahren“ oder „Vergleiche mit 2020“), nutze diesen. Andernfalls nutze dein Wissen über frühere Standards in diesem Themenfeld.\n\n### 3. ANALYSE-KRITERIEN\nÜberprüfe den aktuellen Text auf folgende Kategorien:\n1. **Revidierte Aussagen:** Was wurde früher behauptet/geglaubt, das heute korrigiert oder widerlegt ist?\n2. **Neue/Ergänzte Aspekte:** Welche Informationen sind neu hinzugekommen, die früher unbekannt oder irrelevant waren?\n3. **Bestätigte Aussagen:** Welche Kernthesen haben sich über die Zeit als dauerhaft richtig erwiesen?\n4. **Veraltete Begrifflichkeiten/Methoden:** Haben sich Terminologien, Normen oder Prozesse verändert?\n\n### 4. AUSGABEFORMAT\nGliedere deine Antwort übersichtlich in folgende Abschnitte:\n\n#### A. Kurzzusammenfassung der Entwicklung\n- Ein Absatz über die prägnantesten Veränderungen im Zeitverlauf.\n\n#### B. Detaillierter Vergleich (Tabelle)\nErstelle eine Tabelle mit folgenden Spalten:\n| Thema / Kernaussage | Aussage früher (Vergangenheit) | Aussage heute (Aktueller Text) | Art der Veränderung (z.B. Korrektur, Ergänzung, Bestätigung) |\n\n#### C. Detailanalyse & Bewertung\n- Gehe stichpunktartig auf die wichtigsten Änderungen aus der Tabelle ein und erläutere kurz den Hintergrund oder Trend der Veränderung.\n\n#### D. Handlungsbedarf für die Infoseite\n- Gib 2–3 konkrete Empfehlungen, wie der Text/die Infoseite angepasst werden sollte, damit Leser die zeitliche Einordnung oder Entwicklung noch besser verstehen."
+ },
+ {
+  "id": "DevilsAdvocate",
+  "name": "😈 Gegenargumente",
+  "category": "Analyse & Fakten",
+  "prompt": "Du bist ein kritischer Denker. Analysiere den Text unter dem Link und liefere die 3 stärksten Gegenargumente oder Schwachstellen in der Argumentation des Autors. Link: {{url}}"
+ },
+ {
+  "id": "TitleCheck",
+  "name": "🧾 Titel-Check",
+  "category": "Analyse & Fakten",
+  "prompt": "Analysiere die Überschrift des Artikels unter diesem Link. Passt sie zum Inhalt? Ist sie Clickbait oder irreführend? Wenn sie nicht passt, schlage eine präzisere und neutralere Überschrift vor. Link: {{url}}"
+ },
+ {
+  "id": "Mentors",
+  "name": "🧠 3-Mentoren-Feedback",
+  "category": "Analyse & Fakten",
+  "prompt": "Lies den Inhalt des Links. Nimm nun nacheinander die Denkweise von 3 Persönlichkeiten ein: 1. Einem radikalen Tech-Optimisten (wie Elon Musk), 2. Einem stoischen Philosophen (wie Marcus Aurelius) und 3. Einem knallharten Finanzinvestor. Lass jeden von ihnen das Thema des Links aus seiner Sicht in je 2 Sätzen bewerten und kritisieren. Link: {{url}}"
+ },
+ {
+  "id": "Infographic",
+  "name": "📊 Infografik-Bauplan",
+  "category": "Analyse & Fakten",
+  "prompt": "Analysiere den Link und verwandle den Inhalt in das Konzept für eine Infografik. Erstelle ein klares Text-Layout: 1. Die Haupt-Überschrift, 2. Einen logischen Daten-Ablauf (Schritt 1 bis 4) und 3. Vorschläge für Icons oder Symbole neben den wichtigsten 3 Kennzahlen. Alles rein textbasiert und übersichtlich. Link: {{url}}"
+ },
+ {
+  "id": "TimeCapsule",
+  "name": "⏳ Zeitkapsel (Blick aus 2076)",
+  "category": "Analyse & Fakten",
+  "prompt": "Schreibe einen fiktiven, kurzen Historiker-Bericht aus dem Jahr 2076. Blicke zurück auf das Ereignis/Thema in diesem Link und beschreibe, welche radikalen, unvorhergesehenen Langzeitfolgen (technologisch, gesellschaftlich oder ökologisch) diese Nachricht für die Menschheit hatte. Sei kreativ, aber logisch fundiert. Link: {{url}}"
+ },
+ {
+  "id": "PaywallBuster",
+  "name": "🔓 Paywall-Buster (Kontext-Suche)",
+  "category": "Briefing & Journalismus",
+  "prompt": "Der folgende Link liegt hinter einer Bezahlschranke (Paywall). Deine Aufgabe: Nutze deine Websuche und dein aktuelles Wissen, um herauszufinden, worum es in diesem spezifischen Artikel/Thema geht. Suche nach frei zugänglichen Berichten, Pressemitteilungen oder Alternativquellen zu diesem Ereignis. Erstelle mir dann eine präzise Zusammenfassung der wichtigsten Fakten und Hintergründe, damit ich voll im Bilde bin, ohne den Paywall-Text lesen zu müssen. Link: {{url}}"
+ },
+ {
+  "id": "Journalist",
+  "name": "📰 Redaktions-Chef",
+  "category": "Briefing & Journalismus",
+  "prompt": "Du bist ein objektiver Redakteur. Fasse den Text strukturiert zusammen. Link: {{url}}"
+ },
+ {
+  "id": "Briefing",
+  "name": "⚡ Executive-Briefing",
+  "category": "Briefing & Journalismus",
+  "prompt": "Erstelle ein 'Executive Briefing'. Nutze ausschließlich den Text. Max. 3 Sätze. Link: {{url}}"
+ },
+ {
+  "id": "SocialMedia",
+  "name": "📱 Social Media Post",
+  "category": "Briefing & Journalismus",
+  "prompt": "Schreibe basierend auf dem Link einen packenden LinkedIn-Post (inkl. passender Hashtags) und einen kurzen Tweet (max. 280 Zeichen), der die Kernbotschaft zusammenfasst. Link: {{url}}"
+ },
+ {
+  "id": "VideoSummary",
+  "name": "🎬 Video-Zusammenfasser",
+  "category": "Multimedia & Deep Dive",
+  "prompt": "Fasse das Video unter diesem Link zusammen, inkl. wichtiger Zeitmarken. Bitte schreibe zuerst eine kurze Zusammenfassung. Nutze nur den Inhalt. Danach bitte über den Punkt >Quercheck< eine Abfrage und prüfe die aufgestellten Thesen im Internet ab und belege die mit Quellen. Stelle den Quercheck vor die ausführliche Zusammenfassung des Links. Link: {{url}}"
+ },
+ {
+  "id": "NetCheck",
+  "name": "🌐 Internet-Abgleich & Kontext",
+  "category": "Multimedia & Deep Dive",
+  "prompt": "Analysiere den Inhalt des Links und gleiche die Aussagen mit aktuellen Informationen aus dem Internet ab. Was ist neu? Was ist strittig? Welche Perspektiven fehlen? Link: {{url}}"
+ },
+ {
+  "id": "ActionItems",
+  "name": "✅ To-Do & Action Items",
+  "category": "Multimedia & Deep Dive",
+  "prompt": "Lies den Text und erstelle eine übersichtliche, nach Priorität sortierte To-Do-Liste mit konkreten Handlungsschritten (Action Items), die sich aus dem Inhalt ergeben. Link: {{url}}"
+ },
+ {
+  "id": "TrendInvestor",
+  "name": "💰 Geldanlage- & Depot-Radar",
+  "category": "Privat-Nutzen & Finanzen",
+  "prompt": "Analysiere den Inhalt des Links rein hypothetisch auf wirtschaftliche Trends. Welche Branchen, Technologien oder Sektoren könnten durch diese Entwicklung in den nächsten 5–10 Jahren profitieren (Chancen für ETFs/Aktien)? Welche bestehenden Industrien sind bedroht (Risiken)? Liefere keine Finanzberatung, sondern eine rein logische Trendanalyse basierend auf dem Text. Link: {{url}}"
+ },
+ {
+  "id": "Sparring",
+  "name": "🥊 Sokratischer Sparringspartner",
+  "category": "Privat-Nutzen & Finanzen",
+  "prompt": "Analysiere die These des Artikels unter dem Link. Nimm nun eine kritische Gegenposition ein. Stelle mir 3 präzise, schwer zu beantwortende Fragen, die die Logik des Textes oder meine potenzielle Zustimmung dazu herausfordern. Antworte kurz und warte auf meine Reaktion, um eine Debatte zu starten. Link: {{url}}"
+ },
+ {
+  "id": "CareerCheck",
+  "name": "💼 Job- & Karriere-Schutz",
+  "category": "Privat-Nutzen & Finanzen",
+  "prompt": "Nimm die Rolle eines zukunftsorientierten Karriere-Beraters ein. Wenn die Entwicklungen in diesem Link wahr werden: Welche beruflichen Fähigkeiten (Skills) werden dadurch massiv an Wert gewinnen und welche Aufgaben werden wegrationalisiert? Wie sollte sich ein Arbeitnehmer heute aufstellen, um privat und beruflich davon zu profitieren? Link: {{url}}"
+ },
+ {
+  "id": "BudgetCheck",
+  "name": "🛒 Alltags-Budget & Inflation",
+  "category": "Privat-Nutzen & Finanzen",
+  "prompt": "Analysiere den Inhalt des Links auf Auswirkungen auf den Alltag und das Haushaltsbudget: Welche Preise, Kosten, Gebühren, Steuern oder Inflationseffekte sind betroffen? Was bedeutet das konkret für einen durchschnittlichen Haushalt? Nenne 3 praktische Spartipps oder Handlungsschritte. Stütze dich auf den Text und kennzeichne eigene Einschätzungen als solche. Link: {{url}}"
+ },
+ {
+  "id": "Storyteller",
+  "name": "🎭 Der Storyteller",
+  "category": "Kreativ",
+  "prompt": "Verwandle die harten Fakten und Entwicklungen aus diesem Link in eine kurze, packende Alltagsgeschichte oder Parabel. Nutze fiktive Charaktere, um das Problem und die Lösung dieses Artikels bildhaft und spannend zu erklären. Link: {{url}}"
+ },
+ {
+  "id": "CuiBono",
+  "name": "🕵️‍♂️ Wer profitiert? (Cui Bono)",
+  "category": "Kreativ",
+  "prompt": "Analysiere diesen Artikel mit einem detektivischen Blick. Frage dich: 'Cui bono?' – Wer profitiert wirklich von dieser Entwicklung, dieser Nachricht oder diesem Gesetz? Wer verliert dabei? Welche versteckten (wirtschaftlichen oder politischen) Interessen könnten hinter den Kulissen eine Rolle spielen? Link: {{url}}"
+ },
+ {
+  "id": "BullshitFilter",
+  "name": "💨 Buzzword- & Bullshit-Filter",
+  "category": "Kreativ",
+  "prompt": "Du bist ein skeptischer Faktensucher. Filter aus dem folgenden Link sämtliches Marketing-Geschwätz, PR-Hype, Buzzwords und emotionale Übertreibungen heraus. Reduziere den Text radikal auf das, was tatsächlich substanziell, messbar und beweisbar übrig bleibt. Link: {{url}}"
+ },
+ {
+  "id": "360-Text-Analyzer",
+  "name": "🌐 360 Text-Analyzer",
+  "category": "Kreativ",
+  "prompt": "Rolle: Du bist ein präziser Analyst, Informationsarchitekt und strategischer Denkpartner.\nAufgabe: Verwandle den nachfolgenden Text in ein hochkompaktes, strukturiertes Smart Cheatsheet und schlage mir anschließend Möglichkeiten zur Vertiefung vor.\nSTRIKTE REGEL (Keine Erfindungen / Fact-Checking):\nNutze für die Blöcke 1 bis 3 ausschließlich die Fakten und Informationen aus dem bereitgestellten Text. Erfinde keine Fakten, Zahlen oder Details dazu. Wenn eine Information im Text fehlt, lasse den Punkt weg oder markiere ihn als Nicht im Text enthalten.\n\nAufbau des Smart Cheatsheets:\n\n📌 Der Kernsatz \n\nDer Inhalt auf den Punkt gebracht (max. 1-2 Sätze).\n\n⚡ Schnellübersicht & Fakten-Check (Markdown-Tabelle) \n\nTabelle mit den Kernkonzepten, Zahlen, Daten oder Schritten aus dem Text.\n\n⚖️ Do's & Don'ts / Vor- & Nachteile \n\nWas funktioniert/gilt vs. was vermieden/beachtet werden muss (in Spiegelpunkten).\n\n🧠 Mehrwert & Strategische Einordnung (Hier darfst du dein Allgemeinwissen nutzen) \n\nPresse & Diskurs: Wie wird dieses Thema in Medien/Fachwelt aktuell diskutiert oder eingeordnet?\n\nPraktische Relevanz (Was bedeutet das für mich?): Welche konkrete Konsequenz oder Handlungsempfehlung ergibt sich daraus für den Leser?\n\nKritische Brille: Gibt es Haken, Schwachstellen oder unbeantwortete Fragen im Text?\n\n💡 Der Merksatz (Takeaway) \n\nEin einprägsamer Satz zum Behalten.\n\n❓ Interaktive Vertiefung (Fragen an mich zur Auswahl) Gib mir basierend auf dem Text genau 3 logische Fragen/Optionen, wie wir das Thema nun gemeinsam weitervertiefen können. Formuliere sie als Auswahlmöglichkeiten, auf die ich direkt mit A, B oder C (oder einem kurzen Satz) antworten kann. Beispiele für Richtungen: \n\nOption A: Praxis-Transfer (z. B. Soll ich dir eine Schritt-für-Schritt-Anleitung für dein konkretes Projekt erstellen?)\n\nOption B: Kritische Gegenperspektive / Risiko-Analyse\n\nOption C: Zusammenfassung für Dritte (z. B. als E-Mail, Pitch oder Präsentations-Outline)\n. Link: {{url}}"
+ }
+];
 
-const roles = {
-   
-   "Mentors": "Lies den Inhalt des Links. Nimm nun nacheinander die Denkweise von 3 Persönlichkeiten ein: 1. Einem radikalen Tech-Optimisten (wie Elon Musk), 2. Einem stoischen Philosophen (wie Marcus Aurelius) und 3. Einem knallharten Finanzinvestor. Lass jeden von ihnen das Thema des Links aus seiner Sicht in je 2 Sätzen bewerten und kritisieren. Link: ",
-   "Infographic": "Analysiere den Link und verwandle den Inhalt in das Konzept für eine Infografik. Erstelle ein klares Text-Layout: 1. Die Haupt-Überschrift, 2. Einen logischen Daten-Ablauf (Schritt 1 bis 4) und 3. Vorschläge für Icons oder Symbole neben den wichtigsten 3 Kennzahlen. Alles rein textbasiert und übersichtlich. Link: ",
-   "TimeCapsule": "Schreibe einen fiktiven, kurzen Historiker-Bericht aus dem Jahr 2076. Blicke zurück auf das Ereignis/Thema in diesem Link und beschreibe, welche radikalen, unvorhergesehenen Langzeitfolgen (technologisch, gesellschaftlich oder ökologisch) diese Nachricht für die Menschheit hatte. Sei kreativ, aber logisch fundiert. Link: ",
-   "Sparring": "Analysiere die These des Artikels unter dem Link. Nimm nun eine kritische Gegenposition ein. Stelle mir 3 präzise, schwer zu beantwortende Fragen, die die Logik des Textes oder meine potenzielle Zustimmung dazu herausfordern. Antworte kurz und warte auf meine Reaktion, um eine Debatte zu starten. Link: ",
-   "TrendInvestor": "Analysiere den Inhalt des Links rein hypothetisch auf wirtschaftliche Trends. Welche Branchen, Technologien oder Sektoren könnten durch diese Entwicklung in den nächsten 5–10 Jahren profitieren (Chancen für ETFs/Aktien)? Welche bestehenden Industrien sind bedroht (Risiken)? Liefere keine Finanzberatung, sondern eine rein logische Trendanalyse basierend auf dem Text. Link: ",
-   "CareerCheck": "Nimm die Rolle eines zukunftsorientierten Karriere-Beraters ein. Wenn die Entwicklungen in diesem Link wahr werden: Welche beruflichen Fähigkeiten (Skills) werden dadurch massiv an Wert gewinnen und welche Aufgaben werden wegrationalisiert? Wie sollte sich ein Arbeitnehmer heute aufstellen, um privat und beruflich davon zu profitieren? Link: ",
-   "PaywallBuster": "Der folgende Link liegt hinter einer Bezahlschranke (Paywall). Deine Aufgabe: Nutze deine Websuche und dein aktuelles Wissen, um herauszufinden, worum es in diesem spezifischen Artikel/Thema geht. Suche nach frei zugänglichen Berichten, Pressemitteilungen oder Alternativquellen zu diesem Ereignis. Erstelle mir dann eine präzise Zusammenfassung der wichtigsten Fakten und Hintergründe, damit ich voll im Bilde bin, ohne den Paywall-Text lesen zu müssen. Link: ",
-   "CuiBono": "Analysiere diesen Artikel mit einem detektivischen Blick. Frage dich: 'Cui bono?' – Wer profitiert wirklich von dieser Entwicklung, dieser Nachricht oder diesem Gesetz? Wer verliert dabei? Welche versteckten (wirtschaftlichen oder politischen) Interessen könnten hinter den Kulissen eine Rolle spielen? Link: ",
-   "Storyteller": "Verwandle die harten Fakten und Entwicklungen aus diesem Link in eine kurze, packende Alltagsgeschichte oder Parabel. Nutze fiktive Charaktere, um das Problem und die Lösung dieses Artikels bildhaft und spannend zu erklären. Link: ",
-   "BullshitFilter": "Du bist ein skeptischer Faktensucher. Filter aus dem folgenden Link sämtliches Marketing-Geschwätz, PR-Hype, Buzzwords und emotionale Übertreibungen heraus. Reduziere den Text radikal auf das, was tatsächlich substanziell, messbar und beweisbar übrig bleibt. Link: ",
-   "360-Text-Analyzer": `​Rolle: Du bist ein präziser Analyst, Informationsarchitekt und strategischer Denkpartner.
-Aufgabe: Verwandle den nachfolgenden Text in ein hochkompaktes, strukturiertes Smart Cheatsheet und schlage mir anschließend Möglichkeiten zur Vertiefung vor.
-​STRIKTE REGEL (Keine Erfindungen / Fact-Checking):
-Nutze für die Blöcke 1 bis 3 ausschließlich die Fakten und Informationen aus dem bereitgestellten Text. Erfinde keine Fakten, Zahlen oder Details dazu. Wenn eine Information im Text fehlt, lasse den Punkt weg oder markiere ihn als Nicht im Text enthalten.
+/* ============================================================
+   Hilfsfunktionen & Speicher
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const LS_LINKS = 'myLinks', LS_ROLES = 'kiHubRoles', LS_SEL = 'kiHubSelection';
 
-​Aufbau des Smart Cheatsheets:
-
-​📌 Der Kernsatz 
-
-​Der Inhalt auf den Punkt gebracht (max. 1-2 Sätze).
-
-​⚡ Schnellübersicht & Fakten-Check (Markdown-Tabelle) 
-
-​Tabelle mit den Kernkonzepten, Zahlen, Daten oder Schritten aus dem Text.
-
-​⚖️ Do's & Don'ts / Vor- & Nachteile 
-
-​Was funktioniert/gilt vs. was vermieden/beachtet werden muss (in Spiegelpunkten).
-
-​🧠 Mehrwert & Strategische Einordnung (Hier darfst du dein Allgemeinwissen nutzen) 
-
-​Presse & Diskurs: Wie wird dieses Thema in Medien/Fachwelt aktuell diskutiert oder eingeordnet?
-
-​Praktische Relevanz (Was bedeutet das für mich?): Welche konkrete Konsequency oder Handlungsempfehlung ergibt sich daraus für den Leser?
-
-​Kritische Brille: Gibt es Haken, Schwachstellen oder unbeantwortete Fragen im Text?
-
-​💡 Der Merksatz (Takeaway) 
-
-​Ein einprägsamer Satz zum Behalten.
-
-​❓ Interaktive Vertiefung (Fragen an mich zur Auswahl) Gib mir basierend auf dem Text genau 3 logische Fragen/Optionen, wie wir das Thema nun gemeinsam weitervertiefen können. Formuliere sie als Auswahlmöglichkeiten, auf die ich direkt mit A, B oder C (oder einem kurzen Satz) antworten kann. Beispiele für Richtungen: 
-
-​Option A: Praxis-Transfer (z. B. Soll ich dir eine Schritt-für-Schritt-Anleitung für dein konkretes Projekt erstellen?)
-
-​Option B: Kritische Gegenperspektive / Risiko-Analyse
-
-​Option C: Zusammenfassung für Dritte (z. B. als E-Mail, Pitch oder Präsentations-Outline)
-. Link: `,
-   
-    "Analyst": "Du bist ein präziser Analyst. Nutze AUSSCHLIESSLICH den Inhalt des folgenden Links. Liste die 5 wichtigsten Fakten auf. Link: ",
-    "FactChecker": "Du bist ein Fact-Checker. Prüfe die Aussagen NUR anhand des Textes. Wenn eine Behauptung nicht belegt ist, markiere sie. Link: ",
-    "TitleCheck": "Analysiere die Überschrift des Artikels unter diesem Link. Passt sie zum Inhalt? Ist sie Clickbait oder irreführend? Wenn sie nicht passt, schlage eine präzisere und neutralere Überschrift vor. Link: ",
-    "Journalist": "Du bist ein objektiver Redakteur. Fasse den Text strukturiert zusammen. Link: ",
-    "Briefing": "Erstelle ein 'Executive Briefing'. Nutze ausschließlich den Text. Max. 3 Sätze. Link: ",
-    "VideoSummary": "Fasse das Video unter diesem Link zusammen, inkl. wichtiger Zeitmarken. Bitte schreibe zuerst eine kurze Zusammenfassung. Nutze nur den Inhalt. Danach bitte über den Punkt >Querscheck< eine Abfrage und prüfe die aufgestellten Thesen im Internet ab und belege die mit Quellen. Stelle den Quercheck vor die ausführliche Zusammenfassung des Links. Link: ",
-    "NetCheck": "Analysiere den Inhalt des Links und gleiche die Aussagen mit aktuellen Informationen aus dem Internet ab. Was ist neu? Was ist strittig? Welche Perspektiven fehlen? Link: ",
-    "DevilsAdvocate": "Du bist ein kritischer Denker. Analysiere den Text unter dem Link und liefere die 3 stärksten Gegenargumente oder Schwachstellen in der Argumentation des Autors. Link: ",
-    "SocialMedia": "Schreibe basierend auf dem Link einen packenden LinkedIn-Post (inkl. passender Hashtags) und einen kurzen Tweet (max. 280 Zeichen), der die Kernbotschaft zusammenfasst. Link: ",
-    "ActionItems": "Lies den Text und erstelle eine übersichtliche, nach Priorität sortierte To-Do-Liste mit konkreten Handlungsschritten (Action Items), die sich aus dem Inhalt ergeben. Link: ",
-    "EinfachErklaert": "Du bist ein Experte darin, komplexe Themen einfach zu erklären. Fasse den Inhalt des folgenden Links in einfacher Sprache zusammen, so dass es jeder sofort versteht. Nutze AUSSCHLIESSLICH den Text der Seite. Link: "
-};
-
-function esc(t) {
-    return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function loadJSON(key, fallback) {
+    try { const v = JSON.parse(localStorage.getItem(key)); return v === null || v === undefined ? fallback : v; }
+    catch (e) { return fallback; }
+}
+function saveJSON(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* Speicher nicht verfügbar */ }
 }
 
-function renderLinks() {
-    const container = document.getElementById('quickLinksContainer');
-    container.innerHTML = "";
-    links.forEach((link, index) => {
-        const div = document.createElement('div');
-        div.className = 'link-item';
-        div.innerHTML = `
-            <div style="display: flex; gap: 5px; margin-right: 10px;">
-                <span style="cursor:pointer;" data-act="up">▲</span>
-                <span style="cursor:pointer;" data-act="down">▼</span>
-            </div>
-            <div class="link-name" data-act="use">${esc(link.name)}</div>
-            <div class="link-open" data-act="open">↗</div>
-            <div class="del-btn" data-act="del">✕</div>`;
-        div.addEventListener('click', e => {
-            const act = e.target.dataset.act;
-            if (act === 'up') moveLink(index, -1);
-            else if (act === 'down') moveLink(index, 1);
-            else if (act === 'use') setLink(link.url);
-            else if (act === 'open') window.open(link.url, '_blank');
-            else if (act === 'del') removeLink(index);
+let toastTimer = null;
+function toast(msg) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+/* ---------- Favoriten ---------- */
+const DEFAULT_LINKS = [{ name: "DLF Presseschau", url: "https://www.deutschlandfunk.de/presseschauen-100.html" }];
+function cleanLinks(arr) {
+    if (!Array.isArray(arr)) return null;
+    return arr.filter(l => l && typeof l.name === 'string' && typeof l.url === 'string')
+              .map(l => ({ name: l.name, url: l.url }));
+}
+let links = cleanLinks(loadJSON(LS_LINKS, null)) || DEFAULT_LINKS.slice();
+
+/* ---------- Rollen-Zustand: Anpassungen über den Standard-Rollen ---------- */
+function normalizeRoleState(s) {
+    const out = { overrides: {}, custom: [], hidden: [], order: [] };
+    if (!s || typeof s !== 'object') return out;
+    if (s.overrides && typeof s.overrides === 'object' && !Array.isArray(s.overrides)) {
+        for (const [id, o] of Object.entries(s.overrides)) {
+            if (o && typeof o === 'object' && typeof o.name === 'string' && typeof o.prompt === 'string') {
+                out.overrides[id] = { name: o.name, category: typeof o.category === 'string' ? o.category : '', prompt: o.prompt };
+            }
+        }
+    }
+    if (Array.isArray(s.custom)) {
+        out.custom = s.custom.filter(c => c && typeof c.id === 'string' && typeof c.name === 'string' && typeof c.prompt === 'string')
+            .map(c => ({ id: c.id, name: c.name, category: typeof c.category === 'string' && c.category ? c.category : 'Eigene Rollen', prompt: c.prompt }));
+    }
+    if (Array.isArray(s.hidden)) out.hidden = s.hidden.filter(x => typeof x === 'string');
+    if (Array.isArray(s.order)) out.order = s.order.filter((x, i, a) => typeof x === 'string' && a.indexOf(x) === i);
+    return out;
+}
+let roleState = normalizeRoleState(loadJSON(LS_ROLES, null));
+function persistRoles() { saveJSON(LS_ROLES, roleState); }
+
+/* Auswahl (Modus, Einzelrolle, kombinierte Rollen) */
+let uiState = (function () {
+    const s = loadJSON(LS_SEL, {});
+    return {
+        mode: s.mode === 'combo' ? 'combo' : 'single',
+        single: typeof s.single === 'string' ? s.single : '',
+        combo: Array.isArray(s.combo) ? s.combo.filter(x => typeof x === 'string') : []
+    };
+})();
+function persistSel() { saveJSON(LS_SEL, uiState); }
+
+/* Wirksame Rollen = Standard (mit Anpassungen, ohne ausgeblendete) + eigene */
+function getRoles() {
+    const list = [];
+    DEFAULT_ROLES.forEach(d => {
+        if (roleState.hidden.includes(d.id)) return;
+        const o = roleState.overrides[d.id];
+        list.push({
+            id: d.id,
+            name: o ? o.name : d.name,
+            category: o ? (o.category || d.category) : d.category,
+            prompt: o ? o.prompt : d.prompt,
+            isDefault: true, modified: !!o
         });
-        container.appendChild(div);
     });
-    localStorage.setItem('myLinks', JSON.stringify(links));
+    roleState.custom.forEach(c => list.push({ id: c.id, name: c.name, category: c.category, prompt: c.prompt, isDefault: false, modified: false }));
+    if (roleState.order.length) {
+        const pos = new Map(roleState.order.map((id, i) => [id, i]));
+        const base = new Map(list.map((r, i) => [r.id, i]));
+        list.sort((a, b) => {
+            const pa = pos.has(a.id) ? pos.get(a.id) : 1e6 + base.get(a.id);
+            const pb = pos.has(b.id) ? pos.get(b.id) : 1e6 + base.get(b.id);
+            return pa - pb;
+        });
+    }
+    return list;
+}
+function groupByCategory(list) {
+    const map = new Map();
+    list.forEach(r => { if (!map.has(r.category)) map.set(r.category, []); map.get(r.category).push(r); });
+    return Array.from(map.entries());
 }
 
-function copyToClipboard() {
-    const text = document.getElementById('preview').textContent;
-    navigator.clipboard.writeText(text);
-    
-    // Holt den Button, der geklickt wurde
-    const btn = document.querySelector('.btn-share[onclick="copyToClipboard()"]');
-    if (btn) {
-        const originalText = btn.innerHTML;
-        const originalBg = btn.style.background;
-        
-        // Button verändern
-        btn.innerHTML = "✅ Erfolgreich kopiert!";
-        btn.style.background = "#10b981"; // Wechselt zu Grün
-        
-        // Nach 2 Sekunden wieder zurücksetzen
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.style.background = originalBg;
-        }, 2000);
+/* ============================================================
+   Prompt zusammenbauen
+   ============================================================ */
+const RE_URL = /\{\{\s*url\s*\}\}/i, RE_CTX = /\{\{\s*zusatz\s*\}\}/i;
+function fill(tpl, vars) {
+    return tpl.replace(/\{\{\s*(url|zusatz|datum)\s*\}\}/gi, (m, k) => vars[k.toLowerCase()]);
+}
+function buildPrompt(sel, url, context) {
+    if (!sel.length) return '';
+    const u = (url || '').trim() || 'https://...';
+    const ctx = (context || '').trim();
+    const datum = new Date().toLocaleDateString('de-DE');
+    const vars = { url: u, zusatz: ctx, datum: datum };
+    const extra = '\nBeachte zusätzlich folgende Anweisung: ' + ctx;
+
+    if (sel.length === 1) {
+        const tpl = sel[0].prompt;
+        let p = fill(tpl, vars);
+        if (!RE_URL.test(tpl)) p = p.replace(/\s+$/, '') + '\nLink: ' + u;
+        if (ctx && !RE_CTX.test(tpl)) p += extra;
+        return p;
     }
+
+    const parts = sel.map((r, i) => {
+        let t = r.prompt.replace(/\s*Link:\s*\{\{\s*url\s*\}\}\s*$/i, '');
+        t = t.replace(/\{\{\s*url\s*\}\}/gi, 'dem unten genannten Link');
+        t = fill(t, vars);
+        return 'AUFGABE ' + (i + 1) + ' – ' + r.name + ':\n' + t.trim();
+    });
+    let p = 'Bearbeite die folgenden ' + sel.length + ' Aufgaben nacheinander für denselben Link. ' +
+            'Gib jeder Aufgabe eine eigene Überschrift und halte die Teile klar getrennt.\n\n' +
+            parts.join('\n\n') + '\n\nLink: ' + u;
+    if (ctx && !sel.some(r => RE_CTX.test(r.prompt))) p += extra;
+    return p;
 }
 
-function setLink(url) { document.getElementById('url').value = url; update(); }
+/* ============================================================
+   Hauptansicht
+   ============================================================ */
+let previewValid = false;
+let previewExpanded = false;
 
-function appendTag(tagText) {
-    const input = document.getElementById('customContext');
-    // Falls schon was drin steht, hängen wir es mit Komma an, sonst direkt rein
-    if (input.value) {
-        input.value += `, ${tagText}`;
-    } else {
-        input.value = tagText;
-    }
+function selectedRoles() {
+    const roles = getRoles();
+    if (uiState.mode === 'combo') return uiState.combo.map(id => roles.find(r => r.id === id)).filter(Boolean);
+    const r = roles.find(x => x.id === uiState.single);
+    return r ? [r] : [];
+}
+
+function tagList() {
+    return $('customContext').value.split(',').map(s => s.trim()).filter(Boolean);
+}
+function toggleTag(tag) {
+    const parts = tagList();
+    const i = parts.indexOf(tag);
+    if (i >= 0) parts.splice(i, 1); else parts.push(tag);
+    $('customContext').value = parts.join(', ');
     update();
 }
 
+function update() {
+    const sel = selectedRoles();
+    const prev = $('preview');
+    if (!sel.length) {
+        previewValid = false;
+        prev.textContent = uiState.mode === 'combo'
+            ? 'Tippe oben mindestens eine Rolle an.'
+            : 'Keine Rolle verfügbar – hole unter „Rollen & Prompts“ die Standardrollen zurück.';
+    } else {
+        previewValid = true;
+        prev.textContent = buildPrompt(sel, $('url').value, $('customContext').value);
+    }
 
+    const combo = uiState.mode === 'combo';
+    $('btnEditRole').style.display = combo ? 'none' : '';
+    $('comboCount').textContent = combo ? sel.length + ' gewählt' : '';
+    $('comboHint').textContent = combo && sel.length > 3 ? 'Bei mehr als 3 Rollen werden Antworten oft lang und unübersichtlich.' : '';
 
+    const long = previewValid && prev.textContent.length > 320;
+    const wrap = $('previewWrap');
+    wrap.classList.toggle('long', long);
+    wrap.classList.toggle('collapsed', long && !previewExpanded);
+    $('btnShare').disabled = !previewValid;
+    const parts = tagList();
+    document.querySelectorAll('.pill[data-tag]').forEach(b => b.classList.toggle('on', parts.includes(b.dataset.tag)));
+}
+
+function togglePreview() {
+    if (!$('previewWrap').classList.contains('long')) return;
+    previewExpanded = !previewExpanded;
+    update();
+}
+
+function renderRoleSelect() {
+    const roles = getRoles();
+    const sel = $('role');
+    sel.innerHTML = '';
+    groupByCategory(roles).forEach(([cat, list]) => {
+        const og = document.createElement('optgroup');
+        og.label = cat;
+        list.forEach(r => {
+            const o = document.createElement('option');
+            o.value = r.id; o.textContent = r.name;
+            og.appendChild(o);
+        });
+        sel.appendChild(og);
+    });
+    if (!roles.some(r => r.id === uiState.single)) uiState.single = roles.length ? roles[0].id : '';
+    sel.value = uiState.single;
+}
+
+function renderCombo() {
+    const box = $('comboBox');
+    const top = box.scrollTop;
+    box.innerHTML = '';
+    const roles = getRoles();
+    uiState.combo = uiState.combo.filter(id => roles.some(r => r.id === id));
+    groupByCategory(roles).forEach(([cat, list]) => {
+        const h = document.createElement('div');
+        h.className = 'cat'; h.textContent = cat;
+        box.appendChild(h);
+        const wrap = document.createElement('div');
+        wrap.className = 'chips';
+        list.forEach(r => {
+            const b = document.createElement('button');
+            const idx = uiState.combo.indexOf(r.id);
+            b.type = 'button';
+            b.className = 'chip' + (idx >= 0 ? ' on' : '');
+            if (idx >= 0) {
+                const n = document.createElement('span');
+                n.className = 'num'; n.textContent = idx + 1;
+                b.appendChild(n);
+            }
+            b.appendChild(document.createTextNode(r.name));
+            b.addEventListener('click', () => toggleCombo(r.id));
+            wrap.appendChild(b);
+        });
+        box.appendChild(wrap);
+    });
+    box.scrollTop = top;
+}
+
+function toggleCombo(id) {
+    const i = uiState.combo.indexOf(id);
+    if (i >= 0) uiState.combo.splice(i, 1); else uiState.combo.push(id);
+    persistSel();
+    renderCombo();
+    update();
+}
+
+function onRoleChange() {
+    uiState.single = $('role').value;
+    persistSel();
+    update();
+}
+
+function setMode() {
+    uiState.mode = $('comboToggle').checked ? 'combo' : 'single';
+    persistSel();
+    applyMode();
+    update();
+}
+function applyMode() {
+    const combo = uiState.mode === 'combo';
+    $('comboToggle').checked = combo;
+    $('singleBox').style.display = combo ? 'none' : 'block';
+    $('comboWrap').style.display = combo ? 'block' : 'none';
+    $('roleLabel').textContent = combo ? 'Rollen (Reihenfolge = Antippen)' : 'Rolle';
+    if (combo) renderCombo();
+}
+
+function setLink(url) { $('url').value = url; update(); }
+
+/* Zwischenablage mit Fallback */
+async function copyText(text) {
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true;
+        }
+    } catch (e) { /* Fallback unten */ }
+    try {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        const ok = document.execCommand('copy');
+        ta.remove();
+        return ok;
+    } catch (e) { return false; }
+}
+
+/* Ein Button: Teilen-Menü (Handy) – oder direkt kopieren, wenn der Browser kein Teilen kann */
+async function share() {
+    if (!previewValid) return;
+    const text = $('preview').textContent;
+    if (navigator.share) {
+        try { await navigator.share({ text: text }); } catch (e) { /* abgebrochen */ }
+    } else {
+        const ok = await copyText(text);
+        toast(ok ? 'Prompt kopiert' : 'Kopieren nicht möglich');
+    }
+}
+
+/* ============================================================
+   Favoriten
+   ============================================================ */
+function renderLinks() {
+    const container = $('quickLinksContainer');
+    container.innerHTML = '';
+    links.forEach((link, index) => {
+        const row = document.createElement('div');
+        row.className = 'link-item';
+        const name = document.createElement('div');
+        name.className = 'link-name';
+        name.textContent = link.name;
+        name.dataset.act = 'use';
+        row.appendChild(name);
+        [['up', '↑', 'Nach oben'], ['down', '↓', 'Nach unten'], ['open', '↗', 'Öffnen'], ['del', '✕', 'Entfernen']].forEach(([act, sym, label]) => {
+            const b = document.createElement('button');
+            b.type = 'button'; b.className = 'icon'; b.dataset.act = act;
+            b.textContent = sym; b.setAttribute('aria-label', label);
+            row.appendChild(b);
+        });
+        row.addEventListener('click', e => {
+            const el = e.target.closest('[data-act]');
+            if (!el) return;
+            const act = el.dataset.act;
+            if (act === 'up') moveLink(index, -1);
+            else if (act === 'down') moveLink(index, 1);
+            else if (act === 'use') { setLink(link.url); toast('Link übernommen'); }
+            else if (act === 'open') window.open(link.url, '_blank');
+            else if (act === 'del') removeLink(index);
+        });
+        container.appendChild(row);
+    });
+    saveJSON(LS_LINKS, links);
+    renderFavChips();
+}
+
+function renderFavChips() {
+    const box = $('favChips');
+    box.innerHTML = '';
+    box.style.display = links.length ? 'flex' : 'none';
+    links.forEach(l => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'pill';
+        b.textContent = l.name;
+        b.addEventListener('click', () => setLink(l.url));
+        box.appendChild(b);
+    });
+}
 
 function addLink() {
-    const name = document.getElementById('newName').value;
-    const url = document.getElementById('newUrl').value;
-    if(name && url) { 
-        links.push({name, url}); 
-        renderLinks(); 
-        document.getElementById('newName').value = '';
-        document.getElementById('newUrl').value = '';
+    const name = $('newName').value.trim();
+    const url = $('newUrl').value.trim();
+    if (name && url) {
+        links.push({ name, url });
+        renderLinks();
+        $('newName').value = '';
+        $('newUrl').value = '';
     }
 }
-
 function removeLink(index) { links.splice(index, 1); renderLinks(); }
-
-function update() {
-    const url = document.getElementById('url').value;
-    const role = document.getElementById('role').value;
-    const context = document.getElementById('customContext').value;
-    
-    let prompt = roles[role] + (url || "https://...");
-    if (context) {
-        prompt += `\nBeachte zusätzlich folgende Anweisung: ${context}`;
-    }
-    document.getElementById('preview').textContent = prompt;
-}
-
-async function share() {
-    const text = document.getElementById('preview').textContent;
-    if (navigator.share) {
-        try { await navigator.share({text: text}); } catch (e) { /* abgebrochen */ }
-    } else {
-        copyToClipboard();
-    }
-}
-
-async function exportLinks() {
-    const json = JSON.stringify(links, null, 2);
-    const fileName = 'ki-hub-favoriten-' + new Date().toISOString().slice(0, 10) + '.json';
-    const file = new File([json], fileName, { type: 'application/json' });
-
-    // Handy: Teilen-Dialog (in Dateien speichern, AirDrop, Mail ...)
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try { await navigator.share({ files: [file] }); return; }
-        catch (e) { if (e.name === 'AbortError') return; }
-    }
-    // Fallback: normaler Datei-Download
-    const url = URL.createObjectURL(file);
-    const a = document.createElement('a');
-    a.href = url; a.download = fileName;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
 function moveLink(index, direction) {
-    const targetIndex = index + direction;
-    if (targetIndex >= 0 && targetIndex < links.length) {
-        const temp = links[index];
-        links[index] = links[targetIndex];
-        links[targetIndex] = temp;
+    const t = index + direction;
+    if (t >= 0 && t < links.length) {
+        const tmp = links[index]; links[index] = links[t]; links[t] = tmp;
         renderLinks();
     }
 }
 
-function importLinks() { document.getElementById('backupFile').click(); }
+/* ============================================================
+   Rollen & Prompts verwalten
+   ============================================================ */
+let editingId = null;
 
-function handleImportFile(input) {
-    const file = input.files[0];
+function renderRoleList() {
+    const box = $('roleList');
+    const top = box.scrollTop;
+    box.innerHTML = '';
+    const roles = getRoles();
+    groupByCategory(roles).forEach(([cat, list]) => {
+        const h = document.createElement('div');
+        h.className = 'cat'; h.textContent = cat;
+        box.appendChild(h);
+        list.forEach((r, idx) => {
+            const row = document.createElement('div');
+            row.className = 'link-item';
+            row.style.cursor = 'pointer';
+            const name = document.createElement('div');
+            name.className = 'link-name';
+            name.textContent = r.name;
+            if (!r.isDefault || r.modified) {
+                const b = document.createElement('span');
+                b.className = 'badge';
+                b.textContent = r.isDefault ? 'angepasst' : 'eigene';
+                name.appendChild(b);
+            }
+            row.appendChild(name);
+            [['up', '↑', 'Nach oben', idx === 0], ['down', '↓', 'Nach unten', idx === list.length - 1]].forEach(([act, sym, label, off]) => {
+                const b = document.createElement('button');
+                b.type = 'button'; b.className = 'icon'; b.dataset.move = act;
+                b.textContent = sym; b.setAttribute('aria-label', label);
+                b.disabled = off;
+                row.appendChild(b);
+            });
+            row.addEventListener('click', e => {
+                const mv = e.target.closest('[data-move]');
+                if (mv) { if (!mv.disabled) moveRole(r.id, mv.dataset.move === 'up' ? -1 : 1); return; }
+                openEditor(r.id);
+            });
+            box.appendChild(row);
+        });
+    });
+    box.scrollTop = top;
+    const dl = $('catList');
+    dl.innerHTML = '';
+    const cats = new Set(DEFAULT_ROLES.map(d => d.category).concat(roleState.custom.map(c => c.category)));
+    cats.forEach(c => { const o = document.createElement('option'); o.value = c; dl.appendChild(o); });
+
+    const n = roleState.hidden.length;
+    $('btnRestoreHidden').style.display = n ? '' : 'none';
+    $('btnRestoreHidden').textContent = 'Ausgeblendete zurückholen (' + n + ')';
+    $('btnResetOrder').style.display = roleState.order.length ? '' : 'none';
+}
+
+/* Reihenfolge ändern: innerhalb der Kategorie eine Position hoch/runter */
+function moveRole(id, dir) {
+    const roles = getRoles();
+    const i = roles.findIndex(r => r.id === id);
+    if (i < 0) return;
+    const cat = roles[i].category;
+    let j = i + dir;
+    while (j >= 0 && j < roles.length && roles[j].category !== cat) j += dir;
+    if (j < 0 || j >= roles.length) return;
+    const tmp = roles[i]; roles[i] = roles[j]; roles[j] = tmp;
+    const ids = roles.map(r => r.id);
+    roleState.order = ids.concat(roleState.order.filter(x => !ids.includes(x)));
+    refreshRoles();
+}
+
+function resetOrder() {
+    roleState.order = [];
+    refreshRoles();
+    toast('Reihenfolge zurückgesetzt');
+}
+
+function openEditor(id) {
+    const r = id ? getRoles().find(x => x.id === id) : null;
+    editingId = r ? r.id : null;
+    $('edTitle').textContent = r ? 'Rolle bearbeiten' : 'Neue Rolle';
+    $('edName').value = r ? r.name : '';
+    $('edCategory').value = r ? r.category : 'Eigene Rollen';
+    $('edPrompt').value = r ? r.prompt : '';
+    $('btnDup').style.display = r ? '' : 'none';
+    $('btnReset').style.display = r && r.isDefault && r.modified ? '' : 'none';
+    $('btnDelete').style.display = r ? '' : 'none';
+    $('btnDelete').textContent = r && r.isDefault ? 'Ausblenden' : 'Löschen';
+    $('roleEditor').style.display = 'block';
+    $('rolesDetails').open = true;
+    $('roleEditor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function closeEditor() { $('roleEditor').style.display = 'none'; editingId = null; }
+
+function editSelectedRole() {
+    if (uiState.single) openEditor(uiState.single);
+}
+
+function insertPlaceholder(tag) {
+    const ta = $('edPrompt');
+    const s = typeof ta.selectionStart === 'number' ? ta.selectionStart : ta.value.length;
+    const e = typeof ta.selectionEnd === 'number' ? ta.selectionEnd : s;
+    ta.value = ta.value.slice(0, s) + tag + ta.value.slice(e);
+    ta.focus();
+    ta.selectionStart = ta.selectionEnd = s + tag.length;
+}
+
+function newCustomId() { return 'custom_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+function refreshRoles() {
+    persistRoles();
+    renderRoleSelect();
+    if (uiState.mode === 'combo') renderCombo();
+    renderRoleList();
+    persistSel();
+    update();
+}
+
+function saveRole() {
+    const name = $('edName').value.trim();
+    const category = $('edCategory').value.trim() || 'Eigene Rollen';
+    const prompt = $('edPrompt').value.trim();
+    if (!name || !prompt) { alert('Bitte Name und Prompt ausfüllen.'); return; }
+
+    let selectId = editingId;
+    if (editingId === null) {
+        selectId = newCustomId();
+        roleState.custom.push({ id: selectId, name, category, prompt });
+    } else {
+        const def = DEFAULT_ROLES.find(d => d.id === editingId);
+        if (def) {
+            if (name === def.name && category === def.category && prompt === def.prompt.trim()) delete roleState.overrides[editingId];
+            else roleState.overrides[editingId] = { name, category, prompt };
+        } else {
+            const c = roleState.custom.find(x => x.id === editingId);
+            if (c) { c.name = name; c.category = category; c.prompt = prompt; }
+        }
+    }
+    if (uiState.mode === 'single') uiState.single = selectId;
+    refreshRoles();
+    closeEditor();
+    toast('Rolle gespeichert');
+}
+
+function duplicateRole() {
+    const name = $('edName').value.trim() || 'Rolle';
+    const category = $('edCategory').value.trim() || 'Eigene Rollen';
+    const prompt = $('edPrompt').value.trim();
+    if (!prompt) { alert('Der Prompt ist leer.'); return; }
+    const id = newCustomId();
+    roleState.custom.push({ id, name: name + ' (Kopie)', category, prompt });
+    refreshRoles();
+    openEditor(id);
+}
+
+function resetRole() {
+    if (editingId === null) return;
+    delete roleState.overrides[editingId];
+    refreshRoles();
+    openEditor(editingId);
+}
+
+function deleteRole() {
+    if (editingId === null) return;
+    const isDefault = DEFAULT_ROLES.some(d => d.id === editingId);
+    const msg = isDefault
+        ? 'Diese Standardrolle ausblenden? Du kannst sie jederzeit zurückholen.'
+        : 'Diese eigene Rolle endgültig löschen?';
+    if (!confirm(msg)) return;
+    if (isDefault) { if (!roleState.hidden.includes(editingId)) roleState.hidden.push(editingId); }
+    else { roleState.custom = roleState.custom.filter(c => c.id !== editingId); roleState.order = roleState.order.filter(x => x !== editingId); }
+    uiState.combo = uiState.combo.filter(x => x !== editingId);
+    closeEditor();
+    refreshRoles();
+}
+
+function restoreHidden() {
+    roleState.hidden = [];
+    refreshRoles();
+}
+
+function resetAllRoles() {
+    if (!confirm('Alle Anpassungen, eigene Rollen und ausgeblendete Rollen zurücksetzen? Das lässt sich nicht rückgängig machen.')) return;
+    roleState = normalizeRoleState(null);
+    uiState.combo = [];
+    closeEditor();
+    refreshRoles();
+}
+
+/* ============================================================
+   Backup (Favoriten + Rollen)
+   ============================================================ */
+function makeBackup() { return { app: 'ki-hub', version: 2, links: links, roles: roleState }; }
+
+async function exportBackup() {
+    const str = JSON.stringify(makeBackup());
+    const input = $('backupData');
+    input.value = str;
+    input.select();
+    const ok = await copyText(str);
+    toast(ok ? 'Backup-Code kopiert' : 'Code steht im Feld – bitte manuell kopieren');
+}
+
+function downloadBackup() {
+    const blob = new Blob([JSON.stringify(makeBackup(), null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ki-hub-backup.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function importBackupText(text) {
+    text = (text || '').trim();
+    if (!text) { alert('Bitte füge zuerst einen gültigen Backup-Code ein oder wähle eine Datei.'); return; }
+    let parsed;
+    try { parsed = JSON.parse(text); } catch (e) { alert('Fehler beim Importieren. Der Code ist fehlerhaft oder unvollständig.'); return; }
+
+    let newLinks = null, newRoles = null;
+    if (Array.isArray(parsed)) {                       // altes Format: nur Favoriten
+        newLinks = cleanLinks(parsed);
+    } else if (parsed && typeof parsed === 'object') { // neues Format
+        if (parsed.links !== undefined) newLinks = cleanLinks(parsed.links);
+        if (parsed.roles !== undefined) newRoles = normalizeRoleState(parsed.roles);
+    }
+    if (!newLinks && !newRoles) { alert('Ungültiges Backup-Format. Bitte überprüfe den Code.'); return; }
+
+    const info = [];
+    if (newLinks) info.push(newLinks.length + ' Favoriten');
+    if (newRoles) info.push(newRoles.custom.length + ' eigene Rollen und ' + Object.keys(newRoles.overrides).length + ' angepasste Standardrollen');
+    if (!confirm('Möchtest du wirklich ' + info.join(' sowie ') + ' importieren? Die aktuellen Daten in diesen Bereichen werden überschrieben.')) return;
+
+    if (newLinks) { links = newLinks; renderLinks(); }
+    if (newRoles) { roleState = newRoles; uiState.combo = []; closeEditor(); refreshRoles(); }
+    $('backupData').value = '';
+    toast('Backup wiederhergestellt');
+}
+
+function importFromField() { importBackupText($('backupData').value); }
+
+function importFromFile(inputEl) {
+    const file = inputEl.files && inputEl.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
-        try {
-            const parsed = JSON.parse(reader.result);
-            if (!Array.isArray(parsed)) throw new Error('format');
-            const valid = parsed.filter(l => l && typeof l.name === 'string' && typeof l.url === 'string');
-            if (!valid.length) throw new Error('empty');
-            if (confirm(`Möchtest du wirklich ${valid.length} Favoriten wiederherstellen? Deine aktuellen Favoriten werden dabei überschrieben.`)) {
-                links = valid;
-                renderLinks();
-                alert("Favoriten erfolgreich wiederhergestellt! 🎉");
-            }
-        } catch (e) {
-            alert("Die Datei konnte nicht gelesen werden. Bitte wähle eine Sicherungsdatei von KI Hub (.json).");
-        }
-        input.value = '';
-    };
+    reader.onload = () => { importBackupText(String(reader.result)); inputEl.value = ''; };
+    reader.onerror = () => { alert('Die Datei konnte nicht gelesen werden.'); inputEl.value = ''; };
     reader.readAsText(file);
 }
 
-// Skript-Generierung für Optionen entfernt, da diese fest im HTML-Select stehen
-// Rollen-Auswahl (Listen-Fenster wie bei Favoriten)
-document.getElementById('roleList').addEventListener('click', e => {
-    const opt = e.target.closest('.role-opt');
-    if (!opt) return;
-    document.querySelectorAll('.role-opt.selected').forEach(el => el.classList.remove('selected'));
-    opt.classList.add('selected');
-    document.getElementById('role').value = opt.dataset.value;
-    document.getElementById('roleSummary').textContent = opt.textContent;
-    document.getElementById('roleDetails').open = false;
-    update();
-});
-
+/* ============================================================
+   Start
+   ============================================================ */
+$('btnShare').textContent = navigator.share ? 'An KI senden' : 'Prompt kopieren';
 renderLinks();
+renderRoleSelect();
+renderRoleList();
+applyMode();
 update();
 </script>
 </body>
