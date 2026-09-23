@@ -159,7 +159,7 @@
 
     <div class="card">
         <details>
-            <summary>⭐ Favoriten verwalten</summary>
+            <summary>⭐ Einstellungen</summary>
             <div style="margin-top: 20px;">
                 <input type="text" id="newName" placeholder="Name">
                 <input type="url" id="newUrl" placeholder="https://...">
@@ -168,11 +168,11 @@
                 
                 <div style="margin-top: 20px; border-top: 1px solid #334155; padding-top: 15px;">
                     <label style="font-size: 0.8rem;">Backup & Synchronisation:</label>
-                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <button type="button" onclick="exportLinks()" style="background: #475569; border: none; color: white; padding: 10px; flex: 1; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px;">📤 Exportieren</button>
-                        <button type="button" onclick="importLinks()" style="background: #475569; border: none; color: white; padding: 10px; flex: 1; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px;">📥 Importieren</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" onclick="exportLinks()" style="background: #475569; border: none; color: white; padding: 12px; flex: 1; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px;">📤 Sichern</button>
+                        <button type="button" onclick="importLinks()" style="background: #475569; border: none; color: white; padding: 12px; flex: 1; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px;">📥 Wiederherstellen</button>
                     </div>
-                    <input type="text" id="backupData" placeholder="Backup-Code hier einfügen für Import..." style="padding: 12px; font-size: 14px; margin-bottom: 0;">
+                    <input type="file" id="backupFile" accept=".json,application/json,text/plain" onchange="handleImportFile(this)" style="display: none;">
                 </div>
             </div>
         </details>
@@ -350,13 +350,22 @@ async function share() {
     }
 }
 
-function exportLinks() {
-    const backupString = JSON.stringify(links);
-    const backupInput = document.getElementById('backupData');
-    backupInput.value = backupString;
-    backupInput.select();
-    navigator.clipboard.writeText(backupString);
-    alert("Backup-Code wurde in die Zwischenablage kopiert! Speichere ihn an einem sicheren Ort. 💾");
+async function exportLinks() {
+    const json = JSON.stringify(links, null, 2);
+    const fileName = 'ki-hub-favoriten-' + new Date().toISOString().slice(0, 10) + '.json';
+    const file = new File([json], fileName, { type: 'application/json' });
+
+    // Handy: Teilen-Dialog (in Dateien speichern, AirDrop, Mail ...)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file] }); return; }
+        catch (e) { if (e.name === 'AbortError') return; }
+    }
+    // Fallback: normaler Datei-Download
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = url; a.download = fileName;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function moveLink(index, direction) {
@@ -369,32 +378,29 @@ function moveLink(index, direction) {
     }
 }
 
-function importLinks() {
-    const inputData = document.getElementById('backupData').value.trim();
-    if (!inputData) {
-        alert("Bitte füge zuerst einen gültigen Backup-Code in das Textfeld ein.");
-        return;
-    }
-    
-    try {
-        const parsed = JSON.parse(inputData);
-        if (Array.isArray(parsed)) {
-            if (confirm(`Möchtest du wirklich ${parsed.length} Favoriten importieren? Deine aktuellen Favoriten werden dabei überschrieben.`)) {
-                links = parsed;
-                
-                const searchInput = document.getElementById('searchLinks');
-                if (searchInput) searchInput.value = "";
-                
+function importLinks() { document.getElementById('backupFile').click(); }
+
+function handleImportFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+        try {
+            const parsed = JSON.parse(reader.result);
+            if (!Array.isArray(parsed)) throw new Error('format');
+            const valid = parsed.filter(l => l && typeof l.name === 'string' && typeof l.url === 'string');
+            if (!valid.length) throw new Error('empty');
+            if (confirm(`Möchtest du wirklich ${valid.length} Favoriten wiederherstellen? Deine aktuellen Favoriten werden dabei überschrieben.`)) {
+                links = valid;
                 renderLinks();
-                document.getElementById('backupData').value = "";
                 alert("Favoriten erfolgreich wiederhergestellt! 🎉");
             }
-        } else {
-            alert("Ungültiges Backup-Format. Bitte überprüfe den Code.");
+        } catch (e) {
+            alert("Die Datei konnte nicht gelesen werden. Bitte wähle eine Sicherungsdatei von KI Hub (.json).");
         }
-    } catch (e) {
-        alert("Fehler beim Importieren. Der Code ist fehlerhaft oder unvollständig.");
-    }
+        input.value = '';
+    };
+    reader.readAsText(file);
 }
 
 // Skript-Generierung für Optionen entfernt, da diese fest im HTML-Select stehen
