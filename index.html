@@ -81,6 +81,8 @@
 
     /* Pillen (Favoriten, Tags, Rollen) */
     .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .tag-row { flex-wrap: nowrap; }
+    .tag-row .pill { flex: 1; justify-content: center; }
     #favChips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-top: 10px; }
     #favChips::-webkit-scrollbar { display: none; }
     .pill, .chip {
@@ -89,7 +91,7 @@
     }
     .pill:active, .chip:active { background: var(--field-2); }
     .pill.on, .chip.on { background: var(--accent-soft); color: var(--accent-text); }
-    #comboBox { max-height: 300px; overflow-y: auto; margin-bottom: 4px; }
+    #comboBox { background: var(--surface); border-radius: 18px; padding: 14px 16px; max-height: 300px; overflow-y: auto; margin-bottom: 4px; }
     #comboBox .chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip { white-space: normal; text-align: left; }
     .cat { font-size: 13px; font-weight: 600; color: var(--muted); margin: 14px 0 8px 2px; }
@@ -97,12 +99,7 @@
     .num { background: var(--accent); color: #fff; border-radius: 50%; width: 19px; height: 19px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex: none; }
     .note { font-size: 13px; color: var(--muted); margin: 8px 2px 0; }
 
-    /* Schalter (wie in iOS) */
-    .switch-row { display: flex; align-items: center; justify-content: space-between; margin: 14px 2px 0; font-size: 15px; font-weight: 500; color: var(--text); cursor: pointer; }
-    .switch input { -webkit-appearance: none; appearance: none; position: relative; width: 51px; height: 31px; margin: 0; border-radius: 999px; background: var(--field-2); cursor: pointer; transition: background .2s; display: block; }
-    .switch input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: transform .2s; }
-    .switch input:checked { background: var(--accent); }
-    .switch input:checked::after { transform: translateX(20px); }
+    /* (Schalter-Stil wird nicht mehr verwendet, ersetzt durch Segment-Buttons) */
 
     /* Vorschau */
     .preview-wrap { position: relative; background: var(--surface); border-radius: 18px; padding: 16px 18px; }
@@ -116,11 +113,13 @@
     /* Einstellungen als Liste */
     .settings { background: var(--surface); border-radius: 20px; overflow: hidden; }
     .settings details + details { border-top: 1px solid var(--line); }
-    .settings summary { display: flex; align-items: center; justify-content: space-between; padding: 17px 18px; font-size: 16px; font-weight: 550; cursor: pointer; list-style: none; }
+    .settings summary { display: flex; align-items: center; justify-content: space-between; padding: 17px 18px; font-size: 16px; font-weight: 550; cursor: pointer; list-style: none; background: var(--field); }
+    .settings summary:active { background: var(--field-2); }
     .settings summary::-webkit-details-marker { display: none; }
     .settings summary::after { content: ''; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(-45deg); transition: transform .2s; margin-right: 4px; }
     .settings details[open] > summary::after { transform: rotate(45deg); }
     .settings .inner { padding: 2px 18px 20px; }
+    .settings .preview-wrap { background: var(--field); }
     .settings input[type="url"], .settings input[type="text"], .settings textarea { background: var(--field); margin-bottom: 12px; }
 
     .link-item { display: flex; align-items: center; gap: 4px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
@@ -153,7 +152,10 @@
 
     <!-- Link -->
     <section class="field">
-        <label for="url">Link</label>
+        <div class="label-row">
+            <label for="url">Link</label>
+            <button type="button" class="btn-text" id="btnClearUrl" onclick="clearUrl()">Leeren</button>
+        </div>
         <input type="url" id="url" placeholder="https://…" oninput="update()" onclick="this.select()" autocomplete="off" autocapitalize="off" inputmode="url">
         <div class="pills" id="favChips"></div>
     </section>
@@ -170,14 +172,18 @@
             <div id="comboBox"></div>
             <div class="note" id="comboHint"></div>
         </div>
-        <label class="switch-row"><span>Mehrere Rollen kombinieren</span><span class="switch"><input type="checkbox" id="comboToggle" onchange="setMode()"></span></label>
+        <label style="margin-top:18px;">Modus</label>
+        <div class="pills tag-row">
+            <button type="button" class="pill" id="btnModeSingle" onclick="setMode('single')">Einzeln</button>
+            <button type="button" class="pill" id="btnModeCombo" onclick="setMode('combo')">Kombinieren</button>
+        </div>
     </section>
 
     <!-- Zusatz -->
     <section class="field">
         <label for="customContext">Zusatz-Anweisung <span class="opt">optional</span></label>
         <input type="text" id="customContext" placeholder="z. B. Fokus auf Kosten, Vergleich mit 2020" oninput="update()">
-        <div class="pills">
+        <div class="pills tag-row">
             <button type="button" class="pill" data-tag="⚡ Extrem kurz fassen" onclick="toggleTag(this.dataset.tag)">Kurz</button>
             <button type="button" class="pill" data-tag="📊 Als übersichtliche Tabelle" onclick="toggleTag(this.dataset.tag)">Tabelle</button>
             <button type="button" class="pill" data-tag="🧠 Fokus auf versteckte Risiken" onclick="toggleTag(this.dataset.tag)">Risiken</button>
@@ -185,17 +191,19 @@
         </div>
     </section>
 
-    <!-- Vorschau -->
-    <section class="field">
-        <label>Vorschau</label>
-        <div class="preview-wrap" id="previewWrap" onclick="togglePreview()">
-            <div class="preview" id="preview"></div>
-            <span class="more">Mehr anzeigen</span>
-        </div>
-    </section>
-
     <!-- Einstellungen -->
+    <label style="margin:0 0 8px 2px;">Details</label>
     <div class="settings">
+        <details id="previewDetails">
+            <summary>Vorschau</summary>
+            <div class="inner">
+                <div class="preview-wrap" id="previewWrap" onclick="togglePreview()">
+                    <div class="preview" id="preview"></div>
+                    <span class="more">Mehr anzeigen</span>
+                </div>
+            </div>
+        </details>
+
         <details>
             <summary>Favoriten</summary>
             <div class="inner">
@@ -597,6 +605,8 @@ function update() {
         prev.textContent = buildPrompt(sel, $('url').value, $('customContext').value);
     }
 
+    $('btnClearUrl').style.display = $('url').value.trim() ? '' : 'none';
+
     const combo = uiState.mode === 'combo';
     $('btnEditRole').style.display = combo ? 'none' : '';
     $('comboCount').textContent = combo ? sel.length + ' gewählt' : '';
@@ -680,15 +690,16 @@ function onRoleChange() {
     update();
 }
 
-function setMode() {
-    uiState.mode = $('comboToggle').checked ? 'combo' : 'single';
+function setMode(mode) {
+    uiState.mode = mode === 'combo' ? 'combo' : 'single';
     persistSel();
     applyMode();
     update();
 }
 function applyMode() {
     const combo = uiState.mode === 'combo';
-    $('comboToggle').checked = combo;
+    $('btnModeSingle').classList.toggle('on', !combo);
+    $('btnModeCombo').classList.toggle('on', combo);
     $('singleBox').style.display = combo ? 'none' : 'block';
     $('comboWrap').style.display = combo ? 'block' : 'none';
     $('roleLabel').textContent = combo ? 'Rollen (Reihenfolge = Antippen)' : 'Rolle';
@@ -696,6 +707,7 @@ function applyMode() {
 }
 
 function setLink(url) { $('url').value = url; update(); }
+function clearUrl() { $('url').value = ''; update(); $('url').focus(); }
 
 /* Zwischenablage mit Fallback */
 async function copyText(text) {
