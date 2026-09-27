@@ -130,6 +130,9 @@
     .icon:disabled { opacity: 0.25; cursor: default; }
     .icon:disabled:active { background: none; }
     .badge { font-size: 11px; font-weight: 600; color: var(--accent-text); background: var(--accent-soft); border-radius: 6px; padding: 2px 7px; margin-left: 8px; }
+    .badge.cat { color: var(--muted); background: var(--field-2); font-weight: 550; }
+    .drag-handle { cursor: grab; touch-action: none; font-size: 18px; letter-spacing: -2px; }
+    .link-item.dragging { opacity: 0.5; background: var(--field); border-radius: 10px; }
     #roleList { max-height: 320px; overflow-y: auto; margin-bottom: 14px; }
     #roleEditor { display: none; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
     .ph-row { display: flex; gap: 6px; flex-wrap: wrap; margin: -2px 0 10px; }
@@ -150,7 +153,7 @@
 <main class="app">
     <div class="label-row" style="margin:6px 0 26px 2px;">
         <h1 style="margin:0;">KI Hub</h1>
-        <label style="margin:0;">© by Daniel Rufenach</label>
+        <label style="margin:0;">© by Hans Müller</label>
     </div>
 
     <!-- Link -->
@@ -165,7 +168,12 @@
 
     <!-- Rolle -->
     <section class="field">
-        <div class="label-row">
+        <label style="margin:0 0 8px 2px;">Modus</label>
+        <div class="pills tag-row">
+            <button type="button" class="pill" id="btnModeSingle" onclick="setMode('single')">Einzeln</button>
+            <button type="button" class="pill" id="btnModeCombo" onclick="setMode('combo')">Kombinieren</button>
+        </div>
+        <div class="label-row" style="margin-top:18px;">
             <label for="role" id="roleLabel">Rolle</label>
             <button type="button" class="btn-text" id="btnEditRole" onclick="editSelectedRole()">Bearbeiten</button>
             <span class="count" id="comboCount"></span>
@@ -174,11 +182,6 @@
         <div id="comboWrap" style="display:none;">
             <div id="comboBox"></div>
             <div class="note" id="comboHint"></div>
-        </div>
-        <label style="margin-top:18px;">Modus</label>
-        <div class="pills tag-row">
-            <button type="button" class="pill" id="btnModeSingle" onclick="setMode('single')">Einzeln</button>
-            <button type="button" class="pill" id="btnModeCombo" onclick="setMode('combo')">Kombinieren</button>
         </div>
     </section>
 
@@ -264,6 +267,7 @@
             <summary>Backup</summary>
             <div class="inner">
                 <div class="note" style="margin:0 0 14px 0;">Enthält Favoriten, eigene Rollen und alle Prompt-Änderungen.</div>
+                <div class="note" id="backupHint" style="margin:0 0 14px 0;"></div>
                 <div class="grid2">
                     <button type="button" class="btn-soft" onclick="exportBackup()">Code kopieren</button>
                     <button type="button" class="btn-soft" onclick="downloadBackup()">Als Datei speichern</button>
@@ -743,6 +747,40 @@ async function share() {
 }
 
 /* ============================================================
+   Drag & Drop (Sortierlisten per Zieh-Griff, Maus + Touch)
+   ============================================================ */
+function makeSortable(container, onDrop) {
+    container.addEventListener('pointerdown', e => {
+        const handle = e.target.closest('.drag-handle');
+        if (!handle) return;
+        const dragEl = handle.closest('[data-sort-id]');
+        if (!dragEl) return;
+        e.preventDefault();
+        dragEl.classList.add('dragging');
+        const move = ev => {
+            const y = ev.clientY;
+            const rows = Array.from(container.querySelectorAll('[data-sort-id]')).filter(r => r !== dragEl);
+            let target = null;
+            for (const r of rows) {
+                const rect = r.getBoundingClientRect();
+                if (y < rect.top + rect.height / 2) { target = r; break; }
+            }
+            if (target) container.insertBefore(dragEl, target);
+            else container.appendChild(dragEl);
+        };
+        const up = () => {
+            dragEl.classList.remove('dragging');
+            document.removeEventListener('pointermove', move);
+            document.removeEventListener('pointerup', up);
+            const ids = Array.from(container.querySelectorAll('[data-sort-id]')).map(r => r.dataset.sortId);
+            onDrop(ids);
+        };
+        document.addEventListener('pointermove', move);
+        document.addEventListener('pointerup', up);
+    });
+}
+
+/* ============================================================
    Favoriten
    ============================================================ */
 function renderLinks() {
@@ -751,32 +789,36 @@ function renderLinks() {
     links.forEach((link, index) => {
         const row = document.createElement('div');
         row.className = 'link-item';
+        row.dataset.sortId = String(index);
+        const handle = document.createElement('button');
+        handle.type = 'button'; handle.className = 'icon drag-handle';
+        handle.textContent = '⠿'; handle.setAttribute('aria-label', 'Verschieben');
+        row.appendChild(handle);
         const name = document.createElement('div');
         name.className = 'link-name';
         name.textContent = link.name;
-        name.dataset.act = 'use';
+        name.addEventListener('click', () => { setLink(link.url); toast('Link übernommen'); });
         row.appendChild(name);
-        [['up', '↑', 'Nach oben'], ['down', '↓', 'Nach unten'], ['open', '↗', 'Öffnen'], ['del', '✕', 'Entfernen']].forEach(([act, sym, label]) => {
+        [['open', '↗', 'Öffnen'], ['del', '✕', 'Entfernen']].forEach(([act, sym, label]) => {
             const b = document.createElement('button');
-            b.type = 'button'; b.className = 'icon'; b.dataset.act = act;
+            b.type = 'button'; b.className = 'icon';
             b.textContent = sym; b.setAttribute('aria-label', label);
+            b.addEventListener('click', () => {
+                if (act === 'open') window.open(link.url, '_blank');
+                else if (act === 'del') removeLink(index);
+            });
             row.appendChild(b);
-        });
-        row.addEventListener('click', e => {
-            const el = e.target.closest('[data-act]');
-            if (!el) return;
-            const act = el.dataset.act;
-            if (act === 'up') moveLink(index, -1);
-            else if (act === 'down') moveLink(index, 1);
-            else if (act === 'use') { setLink(link.url); toast('Link übernommen'); }
-            else if (act === 'open') window.open(link.url, '_blank');
-            else if (act === 'del') removeLink(index);
         });
         container.appendChild(row);
     });
     saveJSON(LS_LINKS, links);
     renderFavChips();
 }
+makeSortable($('quickLinksContainer'), ids => {
+    const order = ids.map(Number);
+    links = order.map(i => links[i]);
+    renderLinks();
+});
 
 function renderFavChips() {
     const box = $('favChips');
@@ -802,13 +844,6 @@ function addLink() {
     }
 }
 function removeLink(index) { links.splice(index, 1); renderLinks(); }
-function moveLink(index, direction) {
-    const t = index + direction;
-    if (t >= 0 && t < links.length) {
-        const tmp = links[index]; links[index] = links[t]; links[t] = tmp;
-        renderLinks();
-    }
-}
 
 /* ============================================================
    Rollen & Prompts verwalten
@@ -820,38 +855,30 @@ function renderRoleList() {
     const top = box.scrollTop;
     box.innerHTML = '';
     const roles = getRoles();
-    groupByCategory(roles).forEach(([cat, list]) => {
-        const h = document.createElement('div');
-        h.className = 'cat'; h.textContent = cat;
-        box.appendChild(h);
-        list.forEach((r, idx) => {
-            const row = document.createElement('div');
-            row.className = 'link-item';
-            row.style.cursor = 'pointer';
-            const name = document.createElement('div');
-            name.className = 'link-name';
-            name.textContent = r.name;
-            if (!r.isDefault || r.modified) {
-                const b = document.createElement('span');
-                b.className = 'badge';
-                b.textContent = r.isDefault ? 'angepasst' : 'eigene';
-                name.appendChild(b);
-            }
-            row.appendChild(name);
-            [['up', '↑', 'Nach oben', idx === 0], ['down', '↓', 'Nach unten', idx === list.length - 1]].forEach(([act, sym, label, off]) => {
-                const b = document.createElement('button');
-                b.type = 'button'; b.className = 'icon'; b.dataset.move = act;
-                b.textContent = sym; b.setAttribute('aria-label', label);
-                b.disabled = off;
-                row.appendChild(b);
-            });
-            row.addEventListener('click', e => {
-                const mv = e.target.closest('[data-move]');
-                if (mv) { if (!mv.disabled) moveRole(r.id, mv.dataset.move === 'up' ? -1 : 1); return; }
-                openEditor(r.id);
-            });
-            box.appendChild(row);
-        });
+    roles.forEach(r => {
+        const row = document.createElement('div');
+        row.className = 'link-item';
+        row.dataset.sortId = r.id;
+        const handle = document.createElement('button');
+        handle.type = 'button'; handle.className = 'icon drag-handle';
+        handle.textContent = '⠿'; handle.setAttribute('aria-label', 'Verschieben');
+        row.appendChild(handle);
+        const name = document.createElement('div');
+        name.className = 'link-name';
+        name.textContent = r.name;
+        const catBadge = document.createElement('span');
+        catBadge.className = 'badge cat';
+        catBadge.textContent = r.category;
+        name.appendChild(catBadge);
+        if (!r.isDefault || r.modified) {
+            const b = document.createElement('span');
+            b.className = 'badge';
+            b.textContent = r.isDefault ? 'angepasst' : 'eigene';
+            name.appendChild(b);
+        }
+        name.addEventListener('click', () => openEditor(r.id));
+        row.appendChild(name);
+        box.appendChild(row);
     });
     box.scrollTop = top;
     const dl = $('catList');
@@ -864,21 +891,10 @@ function renderRoleList() {
     $('btnRestoreHidden').textContent = 'Ausgeblendete zurückholen (' + n + ')';
     $('btnResetOrder').style.display = roleState.order.length ? '' : 'none';
 }
-
-/* Reihenfolge ändern: innerhalb der Kategorie eine Position hoch/runter */
-function moveRole(id, dir) {
-    const roles = getRoles();
-    const i = roles.findIndex(r => r.id === id);
-    if (i < 0) return;
-    const cat = roles[i].category;
-    let j = i + dir;
-    while (j >= 0 && j < roles.length && roles[j].category !== cat) j += dir;
-    if (j < 0 || j >= roles.length) return;
-    const tmp = roles[i]; roles[i] = roles[j]; roles[j] = tmp;
-    const ids = roles.map(r => r.id);
+makeSortable($('roleList'), ids => {
     roleState.order = ids.concat(roleState.order.filter(x => !ids.includes(x)));
     refreshRoles();
-}
+});
 
 function resetOrder() {
     roleState.order = [];
@@ -1001,6 +1017,17 @@ function resetAllRoles() {
 /* ============================================================
    Backup (Favoriten + Rollen)
    ============================================================ */
+const LS_BACKUP_TS = 'kiHubBackupTs';
+function markBackupDone() { saveJSON(LS_BACKUP_TS, Date.now()); renderBackupHint(); }
+function renderBackupHint() {
+    const ts = loadJSON(LS_BACKUP_TS, null);
+    const el = $('backupHint');
+    if (!ts) { el.textContent = 'Noch kein Backup erstellt.'; return; }
+    const days = Math.floor((Date.now() - ts) / 86400000);
+    if (days <= 0) el.textContent = 'Letztes Backup: heute';
+    else if (days === 1) el.textContent = 'Letztes Backup: vor 1 Tag';
+    else el.textContent = 'Letztes Backup: vor ' + days + ' Tagen';
+}
 function makeBackup() { return { app: 'ki-hub', version: 2, links: links, roles: roleState }; }
 
 async function exportBackup() {
@@ -1009,6 +1036,7 @@ async function exportBackup() {
     input.value = str;
     input.select();
     const ok = await copyText(str);
+    markBackupDone();
     toast(ok ? 'Backup-Code kopiert' : 'Code steht im Feld – bitte manuell kopieren');
 }
 
@@ -1021,6 +1049,7 @@ function downloadBackup() {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    markBackupDone();
 }
 
 function importBackupText(text) {
@@ -1067,6 +1096,7 @@ $('btnShare').textContent = navigator.share ? 'An KI senden' : 'Prompt kopieren'
 renderLinks();
 renderRoleSelect();
 renderRoleList();
+renderBackupHint();
 applyMode();
 update();
 </script>
